@@ -1,0 +1,26 @@
+accelerate
+transformers
+ftfy
+albumentations
+opencv-python
+einops
+diffusers[torch]
+pytorch-lightning
+bitsandbytes
+tensorboard
+safetensors
+gradio
+altair
+easygui
+# for BLIP captioning
+requests
+timm
+fairscale
+# for WD14 captioning
+# tensorflow<2.11
+tensorflow
+huggingface-hub
+# for kohya_ss library
+GitPython
+toml
+voluptuous

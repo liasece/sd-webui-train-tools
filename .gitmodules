@@ -1,0 +1,3 @@
+[submodule "sd_scripts"]
+	path = liasece_sd_webui_train_tools/sd_scripts
+	url = https://github.com/kohya-ss/sd-scripts
