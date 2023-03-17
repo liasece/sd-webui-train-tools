@@ -16,7 +16,7 @@ from liasece_sd_webui_train_tools.project import *
 # from liasece_sd_webui_train_tools.dateset_ui import *
 # from liasece_sd_webui_train_tools.train_ui import *
 
-def on_ui_update_dataset_click(project: str, version: str, input_train_data_set_files: list[tempfile._TemporaryFileWrapper], train_num_repetitions: int, *args) -> list[Image.Image]:
+def on_ui_update_dataset_click(id: str, project: str, version: str, input_train_data_set_files: list[tempfile._TemporaryFileWrapper], train_num_repetitions: int, *args) -> list[Image.Image]:
     train_num_repetitions = int(train_num_repetitions)
     if input_train_data_set_files is None or len(input_train_data_set_files) == 0:
         return

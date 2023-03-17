@@ -15,7 +15,7 @@ from liasece_sd_webui_train_tools.checkpoint_preview_ui import *
 # from liasece_sd_webui_train_tools.dateset_ui import *
 # from liasece_sd_webui_train_tools.train_ui import *
 
-def on_train_begin_click(project: str, version: str,
+def on_train_begin_click(id: str, project: str, version: str,
         # train config
         train_base_model: str, 
         batch_size: int, 

@@ -67,7 +67,7 @@ def new_ui():
                 with gr.Box():
                     gr.Markdown(f"### Current Dataset to be trained")
                     with gr.Row():
-                        gr_project_version_dataset_gallery = gr.Gallery(value=readImages(get_project_version_dataset_processed_path(default_project, default_project_version), 1), label='Output', show_label=False, elem_id=f"txt2txt_gallery").style(grid=4)
+                        gr_project_version_dataset_gallery = gr.Gallery(value=readImages(get_project_version_dataset_processed_path(default_project, default_project_version), 1), label='Output', show_label=False, elem_id=f"gr_project_version_dataset_gallery").style(grid=4)
                     with gr.Row():
                         label = ";".join(readPathSubDirNameList(get_project_version_dataset_processed_path(default_project, default_project_version)))
                         gr_project_version_dataset_label = gr.Textbox(f"Dataset: {label}", lines=1)
@@ -120,9 +120,12 @@ def new_ui():
                             # UI: dataset global config
                             train_num_repetitions = gr.Number(value=-1, label="Train number of repetitions", elem_id="train_num_repetitions")
                     with gr.Row():
-                        # UI: dateset update button and log
-                        update_dataset_btn = gr.Button(value="Update Dataset", variant="primary")
-                        update_dataset_log = gr.HTML(elem_id=f'html_log_Update_Dataset')
+                        with gr.Row(elem_id=f"gr_project_version_dataset_gallery_container"):
+                            # UI: dateset update button
+                            update_dataset_btn = gr.Button(value="Update Dataset", variant="primary", elem_id=f'update_dataset_btn')
+                        with gr.Row():
+                            # UI: dateset update log
+                            update_dataset_log = gr.HTML(elem_id=f'html_log_Update_Dataset')
         with gr.Row(visible=show_dataset) as train_row:
             # UI: train
             with gr.Box():
@@ -153,9 +156,11 @@ def new_ui():
                     with gr.Column(scale=2):
                         train_begin_log = gr.HTML(elem_id=f'html_log_Begin_Train')
                     with gr.Column():
-                        train_finish_generate_all_checkpoint_preview=gr.Checkbox(label="Generate all checkpoint preview after train finished", value=True)
-                        # UI: train button
-                        train_begin_btn = gr.Button(value="Begin train", variant="primary")
+                        with gr.Row():
+                            train_finish_generate_all_checkpoint_preview=gr.Checkbox(label="Generate all checkpoint preview after train finished", value=True)
+                        with gr.Row(elem_id=f"train_begin_btn_container"):
+                            # UI: train button
+                            train_begin_btn = gr.Button(value="Begin train", variant="primary", elem_id=f'begin_train_btn')
         with gr.Box(visible=show_dataset) as preview_box:
             # UI: train checkpoints
             with gr.Box():
@@ -183,7 +188,8 @@ def new_ui():
                     # UI: preview refresh button
                     preview_delete_all_btn = gr.Button(value="Delete all preview image", variant="primary")
                     preview_refresh_btn = gr.Button(value="Refresh all checkpoint preview info", variant="primary")
-                    preview_generate_all_preview_btn = gr.Button(value="Generate all checkpoint preview", variant="primary")
+                    with gr.Row(elem_id=f"preview_generate_all_preview_btn_container"):
+                        preview_generate_all_preview_btn = gr.Button(value="Generate all checkpoint preview", variant="primary", elem_id=f'preview_generate_all_preview_btn')
             checkpoint_list = list_checkpoint(default_project, default_project_version)
             for i in range(0, max_list_checkpoint):
                 visible = i<len(checkpoint_list)
@@ -202,7 +208,7 @@ def new_ui():
                             # UI: train checkpoints item preview action
                             with gr.Row():
                                 images = get_checkpoint_preview_images(default_project, default_project_version, checkpoint_name)
-                                train_checkpoint_txt2txt_preview_gallery_list.append(gr.Gallery(value = images, visible= len(images)>1, label='Output', show_label=False, elem_id=f"txt2txt_gallery").style(grid=[4]))
+                                train_checkpoint_txt2txt_preview_gallery_list.append(gr.Gallery(value = images, visible= len(images)>1, label='Output', show_label=False, elem_id=f"train_checkpoint_txt2txt_preview_gallery").style(grid=[4]))
                                 train_checkpoint_txt2txt_preview_single_image_list.append(gr.Image(value = images[0] if len(images)>0 else None, visible=len(images)==1, label='Output', show_label=False, elem_id=f"txt2txt_image", interactive=False))
                             with gr.Row():
                                 train_checkpoint_txt2txt_preview_btn_log_list.append(gr.HTML(elem_id=f'html_log_Preview'))
@@ -271,7 +277,9 @@ def new_ui():
         )
         update_dataset_btn.click(
             fn=wrap_gradio_gpu_call(on_ui_update_dataset_click, extra_outputs=[None]*len(dataset_outputs())+[""]),
+            _js="on_ui_update_dataset_click",
             inputs=[
+                dummy_component,
                 gr_project_dropdown,
                 gr_version_dropdown,
                 input_train_data_set_files,
@@ -309,7 +317,9 @@ def new_ui():
         )
         train_begin_btn.click(
             fn=wrap_gradio_gpu_call(on_train_begin_click, extra_outputs=[None]*len(checkpoint_box_outputs())+[""]),
+            _js="on_train_begin_click",
             inputs=[
+                dummy_component,
                 gr_project_dropdown,
                 gr_version_dropdown,
                 # train config
@@ -362,7 +372,9 @@ def new_ui():
         )
         preview_generate_all_preview_btn.click(
             fn=wrap_gradio_gpu_call(on_ui_preview_generate_all_preview_btn_click, extra_outputs=[None]*len(checkpoint_box_outputs())+[""]),
+            _js="on_ui_preview_generate_all_preview_btn_click",
             inputs=[
+                dummy_component,
                 gr_project_dropdown, 
                 gr_version_dropdown, 
                 # preview view config

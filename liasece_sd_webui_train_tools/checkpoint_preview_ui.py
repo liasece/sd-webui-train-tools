@@ -115,7 +115,7 @@ def on_ui_delete_all_preview_images_click(project: str, version: str, checkpoint
             shutil.rmtree(path)
     return gr_update_checkpoint_list(project, version)
 
-def on_ui_preview_generate_all_preview_btn_click(project: str, version: str, 
+def on_ui_preview_generate_all_preview_btn_click(id: str, project: str, version: str, 
         # preview view config
         preview_include_sub_img: bool,
         # txt2txt
