@@ -30,7 +30,7 @@ def readCv2Images(inputPath: str, level: int = 0) -> list[(str, cv2.Mat)]:
         if level > 0:
             if os.path.isdir(os.path.join(inputPath, file)):
                 res += readCv2Images(os.path.join(inputPath, file), level-1)
-        elif file.endswith(".png") or file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith(".bmp"):
+        elif file.endswith(".png") or file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith(".bmp") or file.endswith(".webp"):
             img = cv_imread(os.path.join(inputPath, file))
             res.append((file,img))
     return res
