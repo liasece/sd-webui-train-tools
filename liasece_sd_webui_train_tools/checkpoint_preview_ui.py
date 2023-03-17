@@ -37,7 +37,7 @@ def get_checkpoint_preview_images(project: str, version: str, checkpoint_name: s
     checkpoint_preview_images_path = get_checkpoint_preview_images_path(project, version, checkpoint_name)
     if checkpoint_preview_images_path == "":
         return []
-    return readImages(checkpoint_preview_images_path, endswith=".png")
+    return readImages(checkpoint_preview_images_path,level=3, include_pre_level=True, endswith=".png")
 
 def get_checkpoint_preview_images_update(project: str, version: str, checkpoint_name: str):
     images = get_checkpoint_preview_images(project, version, checkpoint_name)

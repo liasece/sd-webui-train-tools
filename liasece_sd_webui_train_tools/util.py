@@ -9,7 +9,7 @@ def printD(*values: object):
     print(f"Train Tools:", *values)
 
 # range all image in folder
-def readImages(inputPath: str, level: int = 0, endswith :str | list[str] = [".png",".jpg",".jpeg",".bmp",".webp"]) -> list[Image.Image]:
+def readImages(inputPath: str, level: int = 0, include_pre_level: bool = False, endswith :str | list[str] = [".png",".jpg",".jpeg",".bmp",".webp"]) -> list[Image.Image]:
     res = []
     if not os.path.isdir(inputPath):
         return res
@@ -18,8 +18,8 @@ def readImages(inputPath: str, level: int = 0, endswith :str | list[str] = [".pn
     for file in os.listdir(inputPath):
         if level > 0:
             if os.path.isdir(os.path.join(inputPath, file)):
-                res += readImages(os.path.join(inputPath, file), level-1)
-        else:
+                res += readImages(os.path.join(inputPath, file), level-1, include_pre_level, endswith)
+        if level <= 0 or include_pre_level:
             ok = False
             if isinstance(endswith, list):
                 for e in endswith:
@@ -60,7 +60,7 @@ def readCheckpoints(inputPath: str, level: int = 0) -> list[(str, str)]:
     for file in os.listdir(inputPath):
         if level > 0:
             if os.path.isdir(os.path.join(inputPath, file)):
-                res += readImages(os.path.join(inputPath, file), level-1)
+                res += readCheckpoints(os.path.join(inputPath, file), level-1)
         elif file.endswith(".checkpoint") or file.endswith(".safetensors"):
             file_path_list.append((file, os.path.getmtime(os.path.join(inputPath, file))))
     file_path_list = sorted([x for x in file_path_list], key=lambda x: x[1], reverse=True)
