@@ -209,22 +209,6 @@ def new_ui():
             return train_checkpoint_row_list + train_checkpoint_info_name_list + train_checkpoint_info_path_list + train_checkpoint_txt2txt_preview_gallery_list + train_checkpoint_txt2txt_preview_single_image_list
         def dataset_outputs():
             return [gr_project_version_dateset_row, train_row, preview_box, gr_project_version_dataset_gallery, gr_project_version_dataset_label]
-        def train_config_inputs(): 
-            return [
-                train_base_model,
-                train_batch_size,
-                train_num_epochs,
-                train_save_every_n_epochs,
-                train_finish_generate_all_checkpoint_preview,
-                train_optimizer_type,
-                train_learning_rate,
-                train_net_dim,
-                train_alpha,
-                train_clip_skip,
-                train_mixed_precision,
-                train_xformers,
-                train_base_on_sd_v2,
-            ]
         def dataset_config_inputs():
             return [
                 train_num_repetitions,
@@ -249,6 +233,22 @@ def new_ui():
                 process_multicrop_maxarea,
                 process_multicrop_objective,
                 process_multicrop_threshold,
+            ]
+        def train_config_inputs(): 
+            return [
+                train_base_model,
+                train_batch_size,
+                train_num_epochs,
+                train_save_every_n_epochs,
+                train_finish_generate_all_checkpoint_preview,
+                train_optimizer_type,
+                train_learning_rate,
+                train_net_dim,
+                train_alpha,
+                train_clip_skip,
+                train_mixed_precision,
+                train_xformers,
+                train_base_on_sd_v2,
             ]
         def preview_config_inputs():
             return [

@@ -19,9 +19,9 @@ from liasece_sd_webui_train_tools.checkpoint_preview_ui import *
 def on_train_begin_click(id: str, project: str, version: str,
         # train config
         train_base_model: str, 
-        batch_size: int, 
-        num_epochs: int, 
-        save_every_n_epochs: int,
+        train_batch_size: int, 
+        train_num_epochs: int, 
+        train_save_every_n_epochs: int,
         train_finish_generate_all_checkpoint_preview: bool,
         train_optimizer_type: str,
         train_learning_rate: float,
@@ -49,9 +49,9 @@ def on_train_begin_click(id: str, project: str, version: str,
     save_train_config(project, version, {
         # train config
         "train_base_model": train_base_model,
-        "batch_size": batch_size,
-        "num_epochs": num_epochs,
-        "save_every_n_epochs": save_every_n_epochs,
+        "train_batch_size": train_batch_size,
+        "train_num_epochs": train_num_epochs,
+        "train_save_every_n_epochs": train_save_every_n_epochs,
         "train_finish_generate_all_checkpoint_preview": train_finish_generate_all_checkpoint_preview,
         "train_optimizer_type": train_optimizer_type,
         "train_learning_rate": train_learning_rate,
@@ -92,9 +92,9 @@ def on_train_begin_click(id: str, project: str, version: str,
     cfg.img_folder = os.path.abspath(processed_path)
     cfg.output_folder = os.path.abspath(project_version_checkpoint_path)
     cfg.change_output_name = project+r"-"+version
-    cfg.batch_size = int(batch_size)
-    cfg.num_epochs = int(num_epochs)
-    cfg.save_every_n_epochs = int(save_every_n_epochs)
+    cfg.batch_size = int(train_batch_size)
+    cfg.num_epochs = int(train_num_epochs)
+    cfg.save_every_n_epochs = int(train_save_every_n_epochs)
     cfg.base_model = train_base_model_path
     cfg.optimizer_type = train_optimizer_type
     cfg.learning_rate = float(train_learning_rate)

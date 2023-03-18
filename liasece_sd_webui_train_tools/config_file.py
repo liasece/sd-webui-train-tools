@@ -29,9 +29,9 @@ default_config = [
     {"process_multicrop_threshold": 0.1},
     # train
     {"train_base_model": None},
-    {"batch_size": 1},
-    {"num_epochs": 40},
-    {"save_every_n_epochs": 5},
+    {"train_batch_size": 1},
+    {"train_num_epochs": 40},
+    {"train_save_every_n_epochs": 5},
     {"train_finish_generate_all_checkpoint_preview": True},
     {"train_optimizer_type": "AdaFactor"},
     {"train_learning_rate": 0.0001},
