@@ -15,10 +15,13 @@ def load_project_list() -> list:
             res.append(os.path.basename(path))
     return res
 
+def get_root_path() -> str:
+    return str(save_project_path)
+
 def get_project_path(project: str) -> str:
     if project == "":
         return ""
-    return str(os.path.join(str(save_project_path), str(project)))
+    return str(os.path.join(get_root_path(), str(project)))
 
 def get_project_version_root_path(project: str) -> str:
     project_path = get_project_path(project)

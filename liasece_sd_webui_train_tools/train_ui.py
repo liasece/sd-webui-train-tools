@@ -9,6 +9,7 @@ from liasece_sd_webui_train_tools import train
 from liasece_sd_webui_train_tools import ArgsList
 
 from liasece_sd_webui_train_tools.project import *
+from liasece_sd_webui_train_tools.config_file import *
 # from liasece_sd_webui_train_tools.project_version_ui import *
 # from liasece_sd_webui_train_tools.ui import *
 from liasece_sd_webui_train_tools.checkpoint_preview_ui import *
@@ -45,6 +46,38 @@ def on_train_begin_click(id: str, project: str, version: str,
         preview_seed: str, # like -1,-1
         preview_lora_multiplier: str, # like 0.6,0.7,0.8,0.9
     ):
+    save_train_config(project, version, {
+        # train config
+        "train_base_model": train_base_model,
+        "batch_size": batch_size,
+        "num_epochs": num_epochs,
+        "save_every_n_epochs": save_every_n_epochs,
+        "train_finish_generate_all_checkpoint_preview": train_finish_generate_all_checkpoint_preview,
+        "train_optimizer_type": train_optimizer_type,
+        "train_learning_rate": train_learning_rate,
+        "train_net_dim": train_net_dim,
+        "train_alpha": train_alpha,
+        "train_clip_skip": train_clip_skip,
+        "train_mixed_precision": train_mixed_precision,
+        "train_xformers": train_xformers,
+        "train_base_on_sd_v2": train_base_on_sd_v2,
+    })
+    save_preview_config(project, version, {
+        # preview view config
+        "preview_include_sub_img": preview_include_sub_img,
+        # txt2txt
+        "preview_txt2img_prompt": preview_txt2img_prompt, # like "apple"
+        "preview_txt2img_negative_prompt": preview_txt2img_negative_prompt, # like "apple"
+        "preview_sampling_method": preview_sampling_method, # like `"Euler a", "ms"`
+        "preview_sampling_steps": preview_sampling_steps, # like 20,24,28
+        "preview_width": preview_width, # like 512
+        "preview_height": preview_height, # like 512
+        "preview_batch_count": preview_batch_count, # like 1
+        "preview_batch_size": preview_batch_size, # like 1
+        "preview_cfg_scale": preview_cfg_scale, # like 8,9,10,11
+        "preview_seed": preview_seed, # like -1,-1
+        "preview_lora_multiplier": preview_lora_multiplier, # like 0.6,0.7,0.8,0.9
+    })
     train_base_model_path = ""
     for x in sd_models.checkpoints_list.values():
         if x.title == train_base_model:

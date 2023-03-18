@@ -19,12 +19,6 @@ def new_ui():
     # ====UI====
     # prepare for train data set
     with gr.Blocks(css="button {background-color: #2171f1}") as train_tools:
-        project_list = load_project_list()
-        default_project = project_list[0] if len(project_list) > 0 else ""
-        project_version_list = load_project_version_list(default_project)
-        default_project_version = project_version_list[0] if len(project_version_list) > 0 else ""
-        show_dataset = default_project_version != ""
-
         # check point list
         train_checkpoint_row_list= []
         train_checkpoint_info_name_list= []
@@ -43,34 +37,33 @@ def new_ui():
                     with gr.Column():
                         with gr.Row():
                             # interactive: must true, this used in create_project_btn click event output
-                            gr_project_dropdown = gr.Dropdown(project_list, label=f"Project", value=default_project, interactive=True)
+                            gr_project_dropdown = gr.Dropdown([], label=f"Project", value=None, interactive=True)
                     with gr.Column():
                         with gr.Row():
                             project_refresh_button = ui.ToolButton(value=ui.refresh_symbol, elem_id="project_refresh_button")
                             create_project_btn = gr.Button(value="Create Project", variant="primary")
-        with gr.Row(visible=True if default_project != "" else False) as gr_project_version_row:
+        with gr.Row(visible=False) as gr_project_version_row:
             # UI: Project version Dropdown
             with gr.Box():  
                 with gr.Row():
                     # UI: Project Version Dropdown
                     with gr.Column():
                         with gr.Row():
-                            gr_version_dropdown = gr.Dropdown(project_version_list, label=f"Version", value=default_project_version, interactive=True)
+                            gr_version_dropdown = gr.Dropdown([], label=f"Version", value=None, interactive=True)
                     with gr.Column():
                         with gr.Row():
                             project_version_refresh_button = ui.ToolButton(value=ui.refresh_symbol, elem_id="refresh_gr_version_dropdown")
                             create_project_version_btn = gr.Button(value="Create Version", variant="primary")
-        with gr.Row(visible=show_dataset) as gr_project_version_dateset_row:
+        with gr.Row(visible=False) as gr_project_version_dateset_row:
             # UI: Project Version Dataset Dropdown
             with gr.Column():
                 # UI: current dataset images
                 with gr.Box():
                     gr.Markdown(f"### Current Dataset to be trained")
                     with gr.Row():
-                        gr_project_version_dataset_gallery = gr.Gallery(value=readImages(get_project_version_dataset_processed_path(default_project, default_project_version), 1), label='Output', show_label=False, elem_id=f"gr_project_version_dataset_gallery").style(grid=4)
+                        gr_project_version_dataset_gallery = gr.Gallery(value=None, label='Output', show_label=False, elem_id=f"gr_project_version_dataset_gallery").style(grid=4)
                     with gr.Row():
-                        label = ";".join(readPathSubDirNameList(get_project_version_dataset_processed_path(default_project, default_project_version)))
-                        gr_project_version_dataset_label = gr.Textbox(f"Dataset: {label}", lines=1)
+                        gr_project_version_dataset_label = gr.Textbox(f"Dataset: None", lines=1)
             with gr.Column():
                 # UI: update dataset
                 with gr.Box():
@@ -84,38 +77,38 @@ def new_ui():
                             gr.Markdown(f"### Preprocess images")
                         with gr.Row():
                             # UI: dateset files upload post process width slider
-                            process_width = gr.Slider(minimum=64, maximum=2048, step=8, label="Width", value=512, elem_id="train_process_width")
-                            process_height = gr.Slider(minimum=64, maximum=2048, step=8, label="Height", value=512, elem_id="train_process_height")
-                            preprocess_txt_action = gr.Dropdown(label='Existing Caption txt Action', value="ignore", choices=["ignore", "copy", "prepend", "append"], elem_id="train_preprocess_txt_action")
+                            process_width = gr.Slider(minimum=64, maximum=2048, step=8, label="Width", value=512, elem_id="process_width")
+                            process_height = gr.Slider(minimum=64, maximum=2048, step=8, label="Height", value=512, elem_id="process_height")
+                            preprocess_txt_action = gr.Dropdown(label='Existing Caption txt Action', value="ignore", choices=["ignore", "copy", "prepend", "append"], elem_id="preprocess_txt_action")
                         with gr.Row():
                             # UI: dateset images post process
                             with gr.Row():
                                 # UI: dateset images post process functional
-                                process_flip = gr.Checkbox(label='Create flipped copies', elem_id="train_process_flip", value=True)
-                                process_split = gr.Checkbox(label='Split oversized images', elem_id="train_process_split")
-                                process_focal_crop = gr.Checkbox(label='Auto focal point crop', elem_id="train_process_focal_crop")
-                                process_multicrop = gr.Checkbox(label='Auto-sized crop', elem_id="train_process_multicrop")
-                                process_caption = gr.Checkbox(label='Use BLIP for caption', elem_id="train_process_caption")
-                                process_caption_deepbooru = gr.Checkbox(label='Use deepbooru for caption', visible=True, elem_id="train_process_caption_deepbooru")
+                                process_flip = gr.Checkbox(label='Create flipped copies', elem_id="process_flip", value=True)
+                                process_split = gr.Checkbox(label='Split oversized images', elem_id="process_split")
+                                process_focal_crop = gr.Checkbox(label='Auto focal point crop', elem_id="process_focal_crop")
+                                process_multicrop = gr.Checkbox(label='Auto-sized crop', elem_id="process_multicrop")
+                                process_caption = gr.Checkbox(label='Use BLIP for caption', elem_id="process_caption")
+                                process_caption_deepbooru = gr.Checkbox(label='Use deepbooru for caption', visible=True, elem_id="process_caption_deepbooru")
                             with gr.Row(visible=False) as process_split_extra_row:
-                                process_split_threshold = gr.Slider(label='Split image threshold', value=0.5, minimum=0.0, maximum=1.0, step=0.05, elem_id="train_process_split_threshold")
-                                process_overlap_ratio = gr.Slider(label='Split image overlap ratio', value=0.2, minimum=0.0, maximum=0.9, step=0.05, elem_id="train_process_overlap_ratio")
+                                process_split_threshold = gr.Slider(label='Split image threshold', value=0.5, minimum=0.0, maximum=1.0, step=0.05, elem_id="process_split_threshold")
+                                process_overlap_ratio = gr.Slider(label='Split image overlap ratio', value=0.2, minimum=0.0, maximum=0.9, step=0.05, elem_id="process_overlap_ratio")
                             with gr.Row(visible=False) as process_focal_crop_row:
-                                process_focal_crop_face_weight = gr.Slider(label='Focal point face weight', value=0.9, minimum=0.0, maximum=1.0, step=0.05, elem_id="train_process_focal_crop_face_weight")
-                                process_focal_crop_entropy_weight = gr.Slider(label='Focal point entropy weight', value=0.15, minimum=0.0, maximum=1.0, step=0.05, elem_id="train_process_focal_crop_entropy_weight")
-                                process_focal_crop_edges_weight = gr.Slider(label='Focal point edges weight', value=0.5, minimum=0.0, maximum=1.0, step=0.05, elem_id="train_process_focal_crop_edges_weight")
-                                process_focal_crop_debug = gr.Checkbox(label='Create debug image', elem_id="train_process_focal_crop_debug")
+                                process_focal_crop_face_weight = gr.Slider(label='Focal point face weight', value=0.9, minimum=0.0, maximum=1.0, step=0.05, elem_id="process_focal_crop_face_weight")
+                                process_focal_crop_entropy_weight = gr.Slider(label='Focal point entropy weight', value=0.15, minimum=0.0, maximum=1.0, step=0.05, elem_id="process_focal_crop_entropy_weight")
+                                process_focal_crop_edges_weight = gr.Slider(label='Focal point edges weight', value=0.5, minimum=0.0, maximum=1.0, step=0.05, elem_id="process_focal_crop_edges_weight")
+                                process_focal_crop_debug = gr.Checkbox(label='Create debug image', elem_id="process_focal_crop_debug")
                             with gr.Column(visible=False) as process_multicrop_col:
                                 gr.Markdown('Each image is center-cropped with an automatically chosen width and height.')
                                 with gr.Row():
-                                    process_multicrop_mindim = gr.Slider(minimum=64, maximum=2048, step=8, label="Dimension lower bound", value=384, elem_id="train_process_multicrop_mindim")
-                                    process_multicrop_maxdim = gr.Slider(minimum=64, maximum=2048, step=8, label="Dimension upper bound", value=768, elem_id="train_process_multicrop_maxdim")
+                                    process_multicrop_mindim = gr.Slider(minimum=64, maximum=2048, step=8, label="Dimension lower bound", value=384, elem_id="process_multicrop_mindim")
+                                    process_multicrop_maxdim = gr.Slider(minimum=64, maximum=2048, step=8, label="Dimension upper bound", value=768, elem_id="process_multicrop_maxdim")
                                 with gr.Row():
-                                    process_multicrop_minarea = gr.Slider(minimum=64*64, maximum=2048*2048, step=1, label="Area lower bound", value=64*64, elem_id="train_process_multicrop_minarea")
-                                    process_multicrop_maxarea = gr.Slider(minimum=64*64, maximum=2048*2048, step=1, label="Area upper bound", value=640*640, elem_id="train_process_multicrop_maxarea")
+                                    process_multicrop_minarea = gr.Slider(minimum=64*64, maximum=2048*2048, step=1, label="Area lower bound", value=64*64, elem_id="process_multicrop_minarea")
+                                    process_multicrop_maxarea = gr.Slider(minimum=64*64, maximum=2048*2048, step=1, label="Area upper bound", value=640*640, elem_id="process_multicrop_maxarea")
                                 with gr.Row():
-                                    process_multicrop_objective = gr.Radio(["Maximize area", "Minimize error"], value="Maximize area", label="Resizing objective", elem_id="train_process_multicrop_objective")
-                                    process_multicrop_threshold = gr.Slider(minimum=0, maximum=1, step=0.01, label="Error threshold", value=0.1, elem_id="train_process_multicrop_threshold")
+                                    process_multicrop_objective = gr.Radio(["Maximize area", "Minimize error"], value="Maximize area", label="Resizing objective", elem_id="process_multicrop_objective")
+                                    process_multicrop_threshold = gr.Slider(minimum=0, maximum=1, step=0.01, label="Error threshold", value=0.1, elem_id="process_multicrop_threshold")
                         with gr.Row():
                             # UI: dataset global config
                             train_num_repetitions = gr.Number(value=-1, label="Train number of repetitions", elem_id="train_num_repetitions")
@@ -126,14 +119,14 @@ def new_ui():
                         with gr.Row():
                             # UI: dateset update log
                             update_dataset_log = gr.HTML(elem_id=f'html_log_Update_Dataset')
-        with gr.Row(visible=show_dataset) as train_row:
+        with gr.Row(visible=False) as train_row:
             # UI: train
             with gr.Box():
                 with gr.Row():
                     with gr.Column():
                         with gr.Row():
                             tiles = shared.list_checkpoint_tiles()
-                            train_base_model = gr.Dropdown(label="Train base model",value= tiles[0] if len(tiles) > 0 else "", choices= tiles, interactive = True)
+                            train_base_model = gr.Dropdown(label="Train base model",value= tiles[0] if len(tiles) > 0 else "", choices= tiles, interactive = True, elem_id="train_base_model")
                             train_base_model_refresh_button = ui.ToolButton(value=ui.refresh_symbol, elem_id="train_base_model_refresh_button")
                         with gr.Row():
                             train_base_on_sd_v2 = gr.Checkbox(label="Base on Stable Diffusion V2", value=False, elem_id="train_base_on_sd_v2")
@@ -157,11 +150,11 @@ def new_ui():
                         train_begin_log = gr.HTML(elem_id=f'html_log_Begin_Train')
                     with gr.Column():
                         with gr.Row():
-                            train_finish_generate_all_checkpoint_preview=gr.Checkbox(label="Generate all checkpoint preview after train finished", value=True)
+                            train_finish_generate_all_checkpoint_preview=gr.Checkbox(label="Generate all checkpoint preview after train finished", value=True, elem_id="train_finish_generate_all_checkpoint_preview")
                         with gr.Row(elem_id=f"train_begin_btn_container"):
                             # UI: train button
                             train_begin_btn = gr.Button(value="Begin train", variant="primary", elem_id=f'begin_train_btn')
-        with gr.Box(visible=show_dataset) as preview_box:
+        with gr.Box(visible=False) as preview_box:
             # UI: train checkpoints
             with gr.Box():
                 # UI: preview config
@@ -171,15 +164,15 @@ def new_ui():
                     preview_txt2img_negative_prompt = gr.Textbox(label='Negative Prompt', value="worst quality, low quality, normal quality",placeholder="Negative Prompt", elem_id="preview_txt2img_negative_prompt", interactive = True, lines=3)
                 with gr.Row():
                     with gr.Column():
-                        preview_width = gr.Slider(minimum=64, maximum=2048, step=8, label="Width", value=512, elem_id="preview_txt2img_width", interactive = True)
-                        preview_height = gr.Slider(minimum=64, maximum=2048, step=8, label="Height", value=512, elem_id="preview_txt2img_height", interactive = True)
-                        preview_batch_count = gr.Slider(minimum=1, step=1, label='Batch count', value=1, elem_id="preview_txt2img_batch_count", interactive = True)
-                        preview_batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='Batch size', value=1, elem_id="preview_txt2img_batch_size", interactive = True)
+                        preview_width = gr.Slider(minimum=64, maximum=2048, step=8, label="Width", value=512, elem_id="preview_width", interactive = True)
+                        preview_height = gr.Slider(minimum=64, maximum=2048, step=8, label="Height", value=512, elem_id="preview_height", interactive = True)
+                        preview_batch_count = gr.Slider(minimum=1, step=1, label='Batch count', value=1, elem_id="preview_batch_count", interactive = True)
+                        preview_batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='Batch size', value=1, elem_id="preview_batch_size", interactive = True)
                     with gr.Column():
-                        preview_sampling_method = gr.Dropdown(label='Sampling method', choices=[x.name for x in sd_samplers.samplers], value=[sd_samplers.samplers[0].name],multiselect = True, elem_id="preview_txt2img_sampling_method", interactive = True)
-                        preview_sampling_steps = gr.Textbox(label="Sampling steps", value="28",placeholder="like 20,24,28", elem_id="preview_txt2img_sampling_steps", interactive = True)
-                        preview_cfg_scale = gr.Textbox(label="CFG Scale Combination", value="10",placeholder="like 8,9,10,11", elem_id="preview_txt2img_cfg_scale", interactive = True)
-                        preview_seed = gr.Textbox(label="Seed Combination", value="-1",placeholder="like -1,-1,-1,-1", elem_id="preview_txt2img_seed", interactive = True)
+                        preview_sampling_method = gr.Dropdown(label='Sampling method', choices=[x.name for x in sd_samplers.samplers], value=[sd_samplers.samplers[0].name],multiselect = True, elem_id="preview_sampling_method", interactive = True)
+                        preview_sampling_steps = gr.Textbox(label="Sampling steps", value="28",placeholder="like 20,24,28", elem_id="preview_sampling_steps", interactive = True)
+                        preview_cfg_scale = gr.Textbox(label="CFG Scale Combination", value="10",placeholder="like 8,9,10,11", elem_id="preview_cfg_scale", interactive = True)
+                        preview_seed = gr.Textbox(label="Seed Combination", value="-1",placeholder="like -1,-1,-1,-1", elem_id="preview_seed", interactive = True)
                         preview_lora_multiplier = gr.Textbox(label="Lora multiplier", value="0.6,0.7,0.8",placeholder="like 0.6,0.7,0.8", elem_id="preview_lora_multiplier", interactive = True)
                     with gr.Column():
                         preview_include_sub_img = gr.Checkbox(label="Include sub images", value=False,elem_id="preview_include_sub_img", interactive = True)
@@ -190,26 +183,21 @@ def new_ui():
                     preview_refresh_btn = gr.Button(value="Refresh all checkpoint preview info", variant="primary")
                     with gr.Row(elem_id=f"preview_generate_all_preview_btn_container"):
                         preview_generate_all_preview_btn = gr.Button(value="Generate all checkpoint preview", variant="primary", elem_id=f'preview_generate_all_preview_btn')
-            checkpoint_list = list_checkpoint(default_project, default_project_version)
             for i in range(0, max_list_checkpoint):
-                visible = i<len(checkpoint_list)
-                checkpoint_name = checkpoint_list[i][0] if visible else ""
-                checkpoint_path = checkpoint_list[i][1] if visible else ""
-                with gr.Box(visible = visible) as train_checkpoint_row:
+                with gr.Box(visible = False) as train_checkpoint_row:
                     with gr.Row():
                         # UI: train checkpoints item
                         with gr.Column():
                             # UI: train checkpoints item info
                             with gr.Row():
-                                train_checkpoint_info_name_list.append(gr.Textbox(label="Checkpoint name", value=checkpoint_name, interactive=False))
+                                train_checkpoint_info_name_list.append(gr.Textbox(label="Checkpoint name", value=None, interactive=False))
                             with gr.Row():
-                                train_checkpoint_info_path_list.append(gr.Textbox(label="Checkpoint path", value=checkpoint_path, interactive=False, lines=3))
+                                train_checkpoint_info_path_list.append(gr.Textbox(label="Checkpoint path", value=None, interactive=False, lines=3))
                         with gr.Column(scale=2):
                             # UI: train checkpoints item preview action
                             with gr.Row():
-                                images = get_checkpoint_preview_images(default_project, default_project_version, checkpoint_name)
-                                train_checkpoint_txt2txt_preview_gallery_list.append(gr.Gallery(value = images, visible= len(images)>1, label='Output', show_label=False, elem_id=f"train_checkpoint_txt2txt_preview_gallery").style(grid=[4]))
-                                train_checkpoint_txt2txt_preview_single_image_list.append(gr.Image(value = images[0] if len(images)>0 else None, visible=len(images)==1, label='Output', show_label=False, elem_id=f"txt2txt_image", interactive=False))
+                                train_checkpoint_txt2txt_preview_gallery_list.append(gr.Gallery(value = None, visible= False, label='Output', show_label=False, elem_id=f"train_checkpoint_txt2txt_preview_gallery").style(grid=[4]))
+                                train_checkpoint_txt2txt_preview_single_image_list.append(gr.Image(value = None, visible=False, label='Output', show_label=False, elem_id=f"txt2txt_image", interactive=False))
                             with gr.Row():
                                 train_checkpoint_txt2txt_preview_btn_log_list.append(gr.HTML(elem_id=f'html_log_Preview'))
                             with gr.Row():
@@ -221,6 +209,66 @@ def new_ui():
             return train_checkpoint_row_list + train_checkpoint_info_name_list + train_checkpoint_info_path_list + train_checkpoint_txt2txt_preview_gallery_list + train_checkpoint_txt2txt_preview_single_image_list
         def dataset_outputs():
             return [gr_project_version_dateset_row, train_row, preview_box, gr_project_version_dataset_gallery, gr_project_version_dataset_label]
+        def train_config_inputs(): 
+            return [
+                train_base_model,
+                train_batch_size,
+                train_num_epochs,
+                train_save_every_n_epochs,
+                train_finish_generate_all_checkpoint_preview,
+                train_optimizer_type,
+                train_learning_rate,
+                train_net_dim,
+                train_alpha,
+                train_clip_skip,
+                train_mixed_precision,
+                train_xformers,
+                train_base_on_sd_v2,
+            ]
+        def dataset_config_inputs():
+            return [
+                train_num_repetitions,
+                process_width,
+                process_height,
+                preprocess_txt_action,
+                process_flip,
+                process_split,
+                process_caption,
+                process_caption_deepbooru,
+                process_split_threshold,
+                process_overlap_ratio,
+                process_focal_crop,
+                process_focal_crop_face_weight,
+                process_focal_crop_entropy_weight,
+                process_focal_crop_edges_weight,
+                process_focal_crop_debug,
+                process_multicrop,
+                process_multicrop_mindim,
+                process_multicrop_maxdim,
+                process_multicrop_minarea,
+                process_multicrop_maxarea,
+                process_multicrop_objective,
+                process_multicrop_threshold,
+            ]
+        def preview_config_inputs():
+            return [
+                # preview view config
+                preview_include_sub_img,
+                # txt2img
+                preview_txt2img_prompt,
+                preview_txt2img_negative_prompt,
+                preview_sampling_method,
+                preview_sampling_steps,
+                preview_width,
+                preview_height,
+                preview_batch_count,
+                preview_batch_size,
+                preview_cfg_scale,
+                preview_seed,
+                preview_lora_multiplier,
+            ]
+        def all_config_inputs():
+            return dataset_config_inputs() + train_config_inputs() + preview_config_inputs()
         # ====Footer====
         gr.Markdown(f"<center>version:{version} author: liasece </center>")
 
@@ -229,35 +277,35 @@ def new_ui():
         gr_project_dropdown.change(
             fn=on_ui_change_project_click,
             inputs=[gr_project_dropdown],
-            outputs=[gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs(),
+            outputs=[gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs()+all_config_inputs(),
         )
         project_refresh_button.click(
             fn = ui_refresh_project,
             inputs = [gr_project_dropdown, gr_version_dropdown],
-            outputs = [gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs(), 
+            outputs = [gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs()+all_config_inputs(), 
         )
         create_project_btn.click(
             fn=on_ui_create_project_click,
             _js="ask_for_project_name",
             inputs=dummy_component,
-            outputs=[gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs(),
+            outputs=[gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs()+all_config_inputs(),
         )
         # project version
         gr_version_dropdown.change(
             fn=on_ui_change_project_version_click,
             inputs=[gr_project_dropdown, gr_version_dropdown],
-            outputs=[gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs(),
+            outputs=[gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs()+all_config_inputs(),
         )
         project_version_refresh_button.click(
             fn = ui_refresh_version,
             inputs = [gr_project_dropdown, gr_version_dropdown],
-            outputs = [gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs(), 
+            outputs = [gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs()+all_config_inputs(), 
         )
         create_project_version_btn.click(
             fn=on_ui_create_project_version_click,
             _js="ask_for_project_version_name",
             inputs=[gr_project_dropdown, dummy_component],
-            outputs=[gr_version_dropdown, gr_project_version_dateset_row]+checkpoint_box_outputs(),
+            outputs=[gr_version_dropdown, gr_project_version_dateset_row]+checkpoint_box_outputs()+all_config_inputs(),
         )
         # dataset
         process_split.change(
@@ -283,30 +331,9 @@ def new_ui():
                 gr_project_dropdown,
                 gr_version_dropdown,
                 input_train_data_set_files,
-                train_num_repetitions,
                 # dataset images preprocess
-                process_width,
-                process_height,
-                preprocess_txt_action,
-                process_flip,
-                process_split,
-                process_caption,
-                process_caption_deepbooru,
-                process_split_threshold,
-                process_overlap_ratio,
-                process_focal_crop,
-                process_focal_crop_face_weight,
-                process_focal_crop_entropy_weight,
-                process_focal_crop_edges_weight,
-                process_focal_crop_debug,
-                process_multicrop,
-                process_multicrop_mindim,
-                process_multicrop_maxdim,
-                process_multicrop_minarea,
-                process_multicrop_maxarea,
-                process_multicrop_objective,
-                process_multicrop_threshold,
-            ],
+            ]
+                +dataset_config_inputs(),
             outputs=dataset_outputs()+[update_dataset_log],
             show_progress=False,
         )
@@ -322,35 +349,12 @@ def new_ui():
                 dummy_component,
                 gr_project_dropdown,
                 gr_version_dropdown,
+            ]
                 # train config
-                train_base_model,
-                train_batch_size,
-                train_num_epochs,
-                train_save_every_n_epochs,
-                train_finish_generate_all_checkpoint_preview,
-                train_optimizer_type,
-                train_learning_rate,
-                train_net_dim,
-                train_alpha,
-                train_clip_skip,
-                train_mixed_precision,
-                train_xformers,
-                train_base_on_sd_v2,
+                +train_config_inputs()
                 # preview view config
-                preview_include_sub_img,
-                # txt2img
-                preview_txt2img_prompt,
-                preview_txt2img_negative_prompt,
-                preview_sampling_method,
-                preview_sampling_steps,
-                preview_width,
-                preview_height,
-                preview_batch_count,
-                preview_batch_size,
-                preview_cfg_scale,
-                preview_seed,
-                preview_lora_multiplier,
-            ],
+                +preview_config_inputs()
+            ,
             outputs=[train_begin_btn]+checkpoint_box_outputs()+[train_begin_log],
         )
         # preview
@@ -378,20 +382,9 @@ def new_ui():
                 gr_project_dropdown, 
                 gr_version_dropdown, 
                 # preview view config
-                preview_include_sub_img,
-                # txt2img
-                preview_txt2img_prompt,
-                preview_txt2img_negative_prompt,
-                preview_sampling_method,
-                preview_sampling_steps,
-                preview_width,
-                preview_height,
-                preview_batch_count,
-                preview_batch_size,
-                preview_cfg_scale,
-                preview_seed,
-                preview_lora_multiplier,
-            ],
+            ]
+                +preview_config_inputs()
+            ,
             outputs=checkpoint_box_outputs()+[preview_generate_all_preview_log],
         )
         for i in range(0, max_list_checkpoint):
@@ -405,26 +398,20 @@ def new_ui():
                     train_checkpoint_info_path_list[i],
                     train_checkpoint_txt2txt_preview_delete_before_generate_list[i],
                     # preview view config
-                    preview_include_sub_img,
-                    # txt2img
-                    preview_txt2img_prompt,
-                    preview_txt2img_negative_prompt,
-                    preview_sampling_method,
-                    preview_sampling_steps,
-                    preview_width,
-                    preview_height,
-                    preview_batch_count,
-                    preview_batch_size,
-                    preview_cfg_scale,
-                    preview_seed,
-                    preview_lora_multiplier,
-                ],
+                ]
+                    +preview_config_inputs()
+                ,
                 outputs=[
                     train_checkpoint_txt2txt_preview_gallery_list[i],
                     train_checkpoint_txt2txt_preview_single_image_list[i],
                     train_checkpoint_txt2txt_preview_btn_log_list[i],
                 ],
             )
+        train_tools.load(
+            fn = ui_refresh_project,
+            inputs = [gr_project_dropdown, gr_version_dropdown],
+            outputs = [gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs()+all_config_inputs(), 
+        )
     return train_tools
 
 def gr_show(visible=True):

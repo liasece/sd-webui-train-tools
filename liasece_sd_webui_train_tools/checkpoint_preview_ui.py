@@ -10,6 +10,7 @@ from liasece_sd_webui_train_tools import preview
 import modules.images as images
 
 from liasece_sd_webui_train_tools.project import *
+from liasece_sd_webui_train_tools.config_file import *
 # from liasece_sd_webui_train_tools.project_version_ui import *
 # from liasece_sd_webui_train_tools.ui import *
 # from liasece_sd_webui_train_tools.checkpoint_preview_ui import *
@@ -82,6 +83,22 @@ def on_ui_preview_1_checkpoint_click(project: str, version: str, checkpoint_name
         preview_seed: str, # like -1,-1
         preview_lora_multiplier: str, # like 0.6,0.7,0.8,0.9
     ):
+    save_preview_config(project, version, {
+        # preview view config
+        "preview_include_sub_img":preview_include_sub_img,
+        # txt2txt
+        "preview_txt2img_prompt":preview_txt2img_prompt, # like "apple"
+        "preview_txt2img_negative_prompt":preview_txt2img_negative_prompt, # like "apple"
+        "preview_sampling_method":preview_sampling_method, # like `"Euler a", "ms"`
+        "preview_sampling_steps":preview_sampling_steps, # like 20,24,28
+        "preview_width":preview_width, # like 512
+        "preview_height":preview_height, # like 512
+        "preview_batch_count":preview_batch_count, # like 1
+        "preview_batch_size":preview_batch_size, # like 1
+        "preview_cfg_scale":preview_cfg_scale, # like 8,9,10,11
+        "preview_seed":preview_seed, # like -1,-1
+        "preview_lora_multiplier":preview_lora_multiplier, # like 0.6,0.7,0.8,0.9
+    })
     save_image_path = get_checkpoint_preview_images_path(project, version, checkpoint_name)
     if before_delete_preview_images:
         if os.path.isdir(save_image_path):
@@ -131,6 +148,22 @@ def on_ui_preview_generate_all_preview_btn_click(id: str, project: str, version:
         preview_seed: str, # like -1,-1
         preview_lora_multiplier: str, # like 0.6,0.7,0.8,0.9
     ):
+    save_preview_config(project, version, {
+        # preview view config
+        "preview_include_sub_img":preview_include_sub_img,
+        # txt2txt
+        "preview_txt2img_prompt":preview_txt2img_prompt, # like "apple"
+        "preview_txt2img_negative_prompt":preview_txt2img_negative_prompt, # like "apple"
+        "preview_sampling_method":preview_sampling_method, # like `"Euler a", "ms"`
+        "preview_sampling_steps":preview_sampling_steps, # like 20,24,28
+        "preview_width":preview_width, # like 512
+        "preview_height":preview_height, # like 512
+        "preview_batch_count":preview_batch_count, # like 1
+        "preview_batch_size":preview_batch_size, # like 1
+        "preview_cfg_scale":preview_cfg_scale, # like 8,9,10,11
+        "preview_seed":preview_seed, # like -1,-1
+        "preview_lora_multiplier":preview_lora_multiplier, # like 0.6,0.7,0.8,0.9
+    })
     # turn -1 seed to random
     preview_seed_list = preview_seed.split(",")
     for i in range(0, len(preview_seed_list)):
