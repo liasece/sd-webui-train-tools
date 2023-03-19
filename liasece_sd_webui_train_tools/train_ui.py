@@ -107,7 +107,7 @@ def on_train_begin_click(id: str, project: str, version: str,
     printD("on_train_begin_click", cfg.__dict__)
     train.train(cfg)
     if train_finish_generate_all_checkpoint_preview:
-        return [None]+on_ui_preview_generate_all_preview_btn_click(project, version,
+        return [None]+on_ui_preview_generate_all_preview_btn_click(id, project, version,
             preview_include_sub_img,
             preview_txt2img_prompt,
             preview_txt2img_negative_prompt,

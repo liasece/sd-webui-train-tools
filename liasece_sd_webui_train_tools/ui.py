@@ -63,7 +63,7 @@ def new_ui():
                     with gr.Row():
                         gr_project_version_dataset_gallery = gr.Gallery(value=None, label='Output', show_label=False, elem_id=f"gr_project_version_dataset_gallery").style(grid=4)
                     with gr.Row():
-                        gr_project_version_dataset_label = gr.Textbox(f"Dataset: None", lines=1)
+                        gr_project_version_dataset_label = gr.Textbox(f"Dataset: None", lines=1, interactive = False)
             with gr.Column():
                 # UI: update dataset
                 with gr.Box():
@@ -77,41 +77,41 @@ def new_ui():
                             gr.Markdown(f"### Preprocess images")
                         with gr.Row():
                             # UI: dateset files upload post process width slider
-                            process_width = gr.Slider(minimum=64, maximum=2048, step=8, label="Width", value=512, elem_id="process_width")
-                            process_height = gr.Slider(minimum=64, maximum=2048, step=8, label="Height", value=512, elem_id="process_height")
-                            preprocess_txt_action = gr.Dropdown(label='Existing Caption txt Action', value="ignore", choices=["ignore", "copy", "prepend", "append"], elem_id="preprocess_txt_action")
+                            process_width = gr.Slider(minimum=64, maximum=2048, step=8, label="Width", value=512, elem_id="process_width", interactive = True)
+                            process_height = gr.Slider(minimum=64, maximum=2048, step=8, label="Height", value=512, elem_id="process_height", interactive = True)
+                            preprocess_txt_action = gr.Dropdown(label='Existing Caption txt Action', value="ignore", choices=["ignore", "copy", "prepend", "append"], elem_id="preprocess_txt_action", interactive = True)
                         with gr.Row():
                             # UI: dateset images post process
                             with gr.Row():
                                 # UI: dateset images post process functional
-                                process_flip = gr.Checkbox(label='Create flipped copies', elem_id="process_flip", value=True)
-                                process_split = gr.Checkbox(label='Split oversized images', elem_id="process_split")
-                                process_focal_crop = gr.Checkbox(label='Auto focal point crop', elem_id="process_focal_crop")
-                                process_multicrop = gr.Checkbox(label='Auto-sized crop', elem_id="process_multicrop")
-                                process_caption = gr.Checkbox(label='Use BLIP for caption', elem_id="process_caption")
-                                process_caption_deepbooru = gr.Checkbox(label='Use deepbooru for caption', visible=True, elem_id="process_caption_deepbooru")
+                                process_flip = gr.Checkbox(label='Create flipped copies', elem_id="process_flip", value=True, interactive = True)
+                                process_split = gr.Checkbox(label='Split oversized images', elem_id="process_split", interactive = True)
+                                process_focal_crop = gr.Checkbox(label='Auto focal point crop', elem_id="process_focal_crop", interactive = True)
+                                process_multicrop = gr.Checkbox(label='Auto-sized crop', elem_id="process_multicrop", interactive = True)
+                                process_caption = gr.Checkbox(label='Use BLIP for caption', elem_id="process_caption", interactive = True)
+                                process_caption_deepbooru = gr.Checkbox(label='Use deepbooru for caption', visible=True, elem_id="process_caption_deepbooru", interactive = True)
                             with gr.Row(visible=False) as process_split_extra_row:
-                                process_split_threshold = gr.Slider(label='Split image threshold', value=0.5, minimum=0.0, maximum=1.0, step=0.05, elem_id="process_split_threshold")
-                                process_overlap_ratio = gr.Slider(label='Split image overlap ratio', value=0.2, minimum=0.0, maximum=0.9, step=0.05, elem_id="process_overlap_ratio")
+                                process_split_threshold = gr.Slider(label='Split image threshold', value=0.5, minimum=0.0, maximum=1.0, step=0.05, elem_id="process_split_threshold", interactive = True)
+                                process_overlap_ratio = gr.Slider(label='Split image overlap ratio', value=0.2, minimum=0.0, maximum=0.9, step=0.05, elem_id="process_overlap_ratio", interactive = True)
                             with gr.Row(visible=False) as process_focal_crop_row:
-                                process_focal_crop_face_weight = gr.Slider(label='Focal point face weight', value=0.9, minimum=0.0, maximum=1.0, step=0.05, elem_id="process_focal_crop_face_weight")
-                                process_focal_crop_entropy_weight = gr.Slider(label='Focal point entropy weight', value=0.15, minimum=0.0, maximum=1.0, step=0.05, elem_id="process_focal_crop_entropy_weight")
-                                process_focal_crop_edges_weight = gr.Slider(label='Focal point edges weight', value=0.5, minimum=0.0, maximum=1.0, step=0.05, elem_id="process_focal_crop_edges_weight")
-                                process_focal_crop_debug = gr.Checkbox(label='Create debug image', elem_id="process_focal_crop_debug")
+                                process_focal_crop_face_weight = gr.Slider(label='Focal point face weight', value=0.9, minimum=0.0, maximum=1.0, step=0.05, elem_id="process_focal_crop_face_weight", interactive = True)
+                                process_focal_crop_entropy_weight = gr.Slider(label='Focal point entropy weight', value=0.15, minimum=0.0, maximum=1.0, step=0.05, elem_id="process_focal_crop_entropy_weight", interactive = True)
+                                process_focal_crop_edges_weight = gr.Slider(label='Focal point edges weight', value=0.5, minimum=0.0, maximum=1.0, step=0.05, elem_id="process_focal_crop_edges_weight", interactive = True)
+                                process_focal_crop_debug = gr.Checkbox(label='Create debug image', elem_id="process_focal_crop_debug", interactive = True)
                             with gr.Column(visible=False) as process_multicrop_col:
                                 gr.Markdown('Each image is center-cropped with an automatically chosen width and height.')
                                 with gr.Row():
-                                    process_multicrop_mindim = gr.Slider(minimum=64, maximum=2048, step=8, label="Dimension lower bound", value=384, elem_id="process_multicrop_mindim")
-                                    process_multicrop_maxdim = gr.Slider(minimum=64, maximum=2048, step=8, label="Dimension upper bound", value=768, elem_id="process_multicrop_maxdim")
+                                    process_multicrop_mindim = gr.Slider(minimum=64, maximum=2048, step=8, label="Dimension lower bound", value=384, elem_id="process_multicrop_mindim", interactive = True)
+                                    process_multicrop_maxdim = gr.Slider(minimum=64, maximum=2048, step=8, label="Dimension upper bound", value=768, elem_id="process_multicrop_maxdim", interactive = True)
                                 with gr.Row():
-                                    process_multicrop_minarea = gr.Slider(minimum=64*64, maximum=2048*2048, step=1, label="Area lower bound", value=64*64, elem_id="process_multicrop_minarea")
-                                    process_multicrop_maxarea = gr.Slider(minimum=64*64, maximum=2048*2048, step=1, label="Area upper bound", value=640*640, elem_id="process_multicrop_maxarea")
+                                    process_multicrop_minarea = gr.Slider(minimum=64*64, maximum=2048*2048, step=1, label="Area lower bound", value=64*64, elem_id="process_multicrop_minarea", interactive = True)
+                                    process_multicrop_maxarea = gr.Slider(minimum=64*64, maximum=2048*2048, step=1, label="Area upper bound", value=640*640, elem_id="process_multicrop_maxarea", interactive = True)
                                 with gr.Row():
-                                    process_multicrop_objective = gr.Radio(["Maximize area", "Minimize error"], value="Maximize area", label="Resizing objective", elem_id="process_multicrop_objective")
-                                    process_multicrop_threshold = gr.Slider(minimum=0, maximum=1, step=0.01, label="Error threshold", value=0.1, elem_id="process_multicrop_threshold")
+                                    process_multicrop_objective = gr.Radio(["Maximize area", "Minimize error"], value="Maximize area", label="Resizing objective", elem_id="process_multicrop_objective", interactive = True)
+                                    process_multicrop_threshold = gr.Slider(minimum=0, maximum=1, step=0.01, label="Error threshold", value=0.1, elem_id="process_multicrop_threshold", interactive = True)
                         with gr.Row():
                             # UI: dataset global config
-                            train_num_repetitions = gr.Number(value=-1, label="Train number of repetitions", elem_id="train_num_repetitions")
+                            train_num_repetitions = gr.Number(value=-1, label="Train number of repetitions", elem_id="train_num_repetitions", interactive = True)
                     with gr.Row():
                         with gr.Row(elem_id=f"gr_project_version_dataset_gallery_container"):
                             # UI: dateset update button
@@ -129,20 +129,20 @@ def new_ui():
                             train_base_model = gr.Dropdown(label="Train base model",value= tiles[0] if len(tiles) > 0 else "", choices= tiles, interactive = True, elem_id="train_base_model")
                             train_base_model_refresh_button = ui.ToolButton(value=ui.refresh_symbol, elem_id="train_base_model_refresh_button")
                         with gr.Row():
-                            train_base_on_sd_v2 = gr.Checkbox(label="Base on Stable Diffusion V2", value=False, elem_id="train_base_on_sd_v2")
+                            train_base_on_sd_v2 = gr.Checkbox(label="Base on Stable Diffusion V2", value=False, elem_id="train_base_on_sd_v2", interactive = True)
                         with gr.Row():
-                            train_xformers = gr.Checkbox(label="Use xformers", value=True, elem_id="train_xformers")
+                            train_xformers = gr.Checkbox(label="Use xformers", value=True, elem_id="train_xformers", interactive = True)
                         with gr.Row():
-                            train_clip_skip = gr.Number(label="Clip skip (2 if training anime model)", value=2, elem_id="train_clip_skip")
+                            train_clip_skip = gr.Number(label="Clip skip (2 if training anime model)", value=2, elem_id="train_clip_skip", interactive = True)
                         with gr.Row():
-                            train_save_every_n_epochs = gr.Number(value=5, label="Save every n epochs", elem_id="train_save_every_n_epochs")
+                            train_save_every_n_epochs = gr.Number(value=5, label="Save every n epochs", elem_id="train_save_every_n_epochs", interactive = True)
                     with gr.Column():
-                        train_batch_size = gr.Number(value=1, label="Batch size", elem_id="train_batch_size")
-                        train_num_epochs = gr.Number(value=40, label="Number of epochs", elem_id="train_num_epochs")
-                        train_learning_rate = gr.Number(value=0.0001, label="Learning rate", elem_id="train_learning_rate")
+                        train_batch_size = gr.Number(value=1, label="Batch size", elem_id="train_batch_size", interactive = True)
+                        train_num_epochs = gr.Number(value=40, label="Number of epochs", elem_id="train_num_epochs", interactive = True)
+                        train_learning_rate = gr.Number(value=0.0001, label="Learning rate", elem_id="train_learning_rate", interactive = True)
                     with gr.Column():
-                        train_net_dim = gr.Number(value=128, label="Net dim (128 ~ 144MB)", elem_id="train_net_dim")
-                        train_alpha = gr.Number(value=64, label="Alpha (default is half of Net dim)", elem_id="train_alpha")
+                        train_net_dim = gr.Number(value=128, label="Net dim (128 ~ 144MB)", elem_id="train_net_dim", interactive = True)
+                        train_alpha = gr.Number(value=64, label="Alpha (default is half of Net dim)", elem_id="train_alpha", interactive = True)
                         train_optimizer_type = gr.Dropdown(label="Optimizer type",value="AdaFactor", choices=["Adam", "AdamW", "AdamW8bit", "Lion", "SGDNesterov", "SGDNesterov8bit", "DAdaptation", "AdaFactor"], interactive = True, elem_id="train_optimizer_type")
                         train_mixed_precision = gr.Dropdown(label="Mixed precision (If your graphics card supports bf16 better)",value="fp16", choices=["fp16", "bf16"], interactive = True, elem_id="train_mixed_precision")
                 with gr.Row():
@@ -150,7 +150,7 @@ def new_ui():
                         train_begin_log = gr.HTML(elem_id=f'html_log_Begin_Train')
                     with gr.Column():
                         with gr.Row():
-                            train_finish_generate_all_checkpoint_preview=gr.Checkbox(label="Generate all checkpoint preview after train finished", value=True, elem_id="train_finish_generate_all_checkpoint_preview")
+                            train_finish_generate_all_checkpoint_preview=gr.Checkbox(label="Generate all checkpoint preview after train finished", value=True, elem_id="train_finish_generate_all_checkpoint_preview", interactive = True)
                         with gr.Row(elem_id=f"train_begin_btn_container"):
                             # UI: train button
                             train_begin_btn = gr.Button(value="Begin train", variant="primary", elem_id=f'begin_train_btn')
@@ -201,7 +201,7 @@ def new_ui():
                             with gr.Row():
                                 train_checkpoint_txt2txt_preview_btn_log_list.append(gr.HTML(elem_id=f'html_log_Preview'))
                             with gr.Row():
-                                train_checkpoint_txt2txt_preview_delete_before_generate_list.append(gr.Checkbox(label="Delete preview images before generate", value=True))
+                                train_checkpoint_txt2txt_preview_delete_before_generate_list.append(gr.Checkbox(label="Delete preview images before generate", value=True, interactive = True))
                                 train_checkpoint_txt2txt_preview_btn_list.append(gr.Button(value="Generate preview", variant="primary"))
                 train_checkpoint_row_list.append(train_checkpoint_row)
 
