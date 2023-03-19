@@ -127,11 +127,12 @@ def get_project_version_dataset_box_update(project: str, version: str):
     processed_output_path = get_project_version_dataset_processed_path(project, version)
     if processed_output_path == "":
         return [ gr.Row.update(visible=False)]*3+[None]*2
-    label = ";".join(readPathSubDirNameList(processed_output_path))
+    dataset_images = readImages(processed_output_path, 1)
+    label = ";".join(readPathSubDirNameList(processed_output_path)) + f" ({len(dataset_images)} images)"
     return [
         gr.Row.update(visible=version!=""),
         gr.Row.update(visible=version!=""),
         gr.Box.update(visible=version!=""),
-        gr.Gallery.update(value=readImages(processed_output_path, 1)),
+        gr.Gallery.update(value=dataset_images),
         gr.Textbox.update(value=f"Dataset: {label}"),
     ]
