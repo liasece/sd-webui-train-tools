@@ -7,6 +7,7 @@ from modules import sd_models
 from liasece_sd_webui_train_tools.util import *
 from liasece_sd_webui_train_tools import train
 from liasece_sd_webui_train_tools import ArgsList
+import numpy as np
 
 from liasece_sd_webui_train_tools.project import *
 from liasece_sd_webui_train_tools.config_file import *
@@ -23,8 +24,8 @@ def on_train_begin_click(id: str, project: str, version: str,
         train_num_epochs: int, 
         train_save_every_n_epochs: int,
         train_finish_generate_all_checkpoint_preview: bool,
-        train_optimizer_type: str,
-        train_learning_rate: float,
+        train_optimizer_type: list[str],
+        train_learning_rate: str,
         train_net_dim: int,
         train_alpha: int,
         train_clip_skip: int,
@@ -49,15 +50,15 @@ def on_train_begin_click(id: str, project: str, version: str,
     save_train_config(project, version, {
         # train config
         "train_base_model": train_base_model,
-        "train_batch_size": train_batch_size,
-        "train_num_epochs": train_num_epochs,
-        "train_save_every_n_epochs": train_save_every_n_epochs,
+        "train_batch_size": int(train_batch_size),
+        "train_num_epochs": int(train_num_epochs),
+        "train_save_every_n_epochs": int(train_save_every_n_epochs),
         "train_finish_generate_all_checkpoint_preview": train_finish_generate_all_checkpoint_preview,
         "train_optimizer_type": train_optimizer_type,
         "train_learning_rate": train_learning_rate,
-        "train_net_dim": train_net_dim,
-        "train_alpha": train_alpha,
-        "train_clip_skip": train_clip_skip,
+        "train_net_dim": int(train_net_dim),
+        "train_alpha": int(train_alpha),
+        "train_clip_skip": int(train_clip_skip),
         "train_mixed_precision": train_mixed_precision,
         "train_xformers": train_xformers,
         "train_base_on_sd_v2": train_base_on_sd_v2,
@@ -79,35 +80,42 @@ def on_train_begin_click(id: str, project: str, version: str,
         "preview_lora_multiplier": preview_lora_multiplier, # like 0.6,0.7,0.8,0.9
     })
     train_base_model_path = ""
+    train_base_model_name = ""
     for x in sd_models.checkpoints_list.values():
         if x.title == train_base_model:
             train_base_model_path = os.path.join(sd_models.model_path, x.name)
+            train_base_model_name = os.path.splitext(x.name)[0]
             break
     processed_path = get_project_version_dataset_processed_path(project, version)
     os.makedirs(processed_path, exist_ok=True)
-    project_version_checkpoint_path = get_project_version_checkpoint_path(project, version)
-    os.makedirs(project_version_checkpoint_path, exist_ok=True)
 
-    cfg = ArgsList.ArgStore()
-    cfg.img_folder = os.path.abspath(processed_path)
-    cfg.output_folder = os.path.abspath(project_version_checkpoint_path)
-    cfg.change_output_name = project+r"-"+version
-    cfg.batch_size = int(train_batch_size)
-    cfg.num_epochs = int(train_num_epochs)
-    cfg.save_every_n_epochs = int(train_save_every_n_epochs)
-    cfg.base_model = train_base_model_path
-    cfg.optimizer_type = train_optimizer_type
-    cfg.learning_rate = float(train_learning_rate)
-    cfg.net_dim = int(train_net_dim)
-    cfg.alpha = int(train_alpha)
-    cfg.clip_skip = int(train_clip_skip)
-    cfg.mixed_precision = train_mixed_precision
-    cfg.xformers = train_xformers
-    cfg.v2 = train_base_on_sd_v2
-    printD("on_train_begin_click", cfg.__dict__)
-    train.train(cfg)
+    train_learning_rate_list = np.fromstring( train_learning_rate, dtype=np.float64, sep=',' )
+    for train_learning_rate_item in train_learning_rate_list:
+        for train_optimizer_type_item in train_optimizer_type:
+            train_name = (train_base_model_name+"-bs-"+str(int(train_batch_size))+"-ep-"+str(int(train_num_epochs))+"-op-"+str(train_optimizer_type_item)+"-lr-"+str(float(train_learning_rate_item))+"-net-"+str(int(train_net_dim))+"-ap-"+str(int(train_alpha))).replace(" ", "").replace(".", "_")
+            checkpoint_save_path = get_project_version_trains_checkpoint_path(project, version, train_name)
+            os.makedirs(checkpoint_save_path, exist_ok=True)
+            cfg = ArgsList.ArgStore()
+            cfg.img_folder = os.path.abspath(processed_path)
+            cfg.output_folder = os.path.abspath(checkpoint_save_path)
+            cfg.change_output_name = project+r"-"+version
+            cfg.batch_size = int(train_batch_size)
+            cfg.num_epochs = int(train_num_epochs)
+            cfg.save_every_n_epochs = int(train_save_every_n_epochs)
+            cfg.base_model = train_base_model_path
+            cfg.optimizer_type = train_optimizer_type_item
+            cfg.learning_rate = float(train_learning_rate_item)
+            cfg.net_dim = int(train_net_dim)
+            cfg.alpha = int(train_alpha)
+            cfg.clip_skip = int(train_clip_skip)
+            cfg.mixed_precision = train_mixed_precision
+            cfg.xformers = train_xformers
+            cfg.v2 = train_base_on_sd_v2
+            printD("on_train_begin_click", cfg.__dict__)
+            train.train(cfg)
+    # generate preview
     if train_finish_generate_all_checkpoint_preview:
-        return [None]+on_ui_preview_generate_all_preview_btn_click(id, project, version,
+        return [None]+on_ui_preview_generate_all_preview_btn_click(id, project, version, train_name,
             preview_include_sub_img,
             preview_txt2img_prompt,
             preview_txt2img_negative_prompt,
@@ -121,7 +129,7 @@ def on_train_begin_click(id: str, project: str, version: str,
             preview_seed,
             preview_lora_multiplier,
         )
-    return [None]+gr_update_checkpoint_list(project, version)+["done"]
+    return [None]+gr_update_trains_area_list(project, version, train_name)+["done"]
 
 def ui_refresh_train_base_model():
     shared.refresh_checkpoints()

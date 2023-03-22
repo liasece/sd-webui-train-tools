@@ -14,7 +14,7 @@ import os
 
 import scripts.xyz_grid as xyz_grid
 
-def preview_checkpoint(save_file_path: str, project: str, version: str, checkpoint_name: str, checkpoint_path: str, 
+def preview_checkpoint(save_file_path: str, checkpoint_name: str, checkpoint_path: str, 
         # preview view config
         preview_include_sub_img: bool,
         # txt2txt

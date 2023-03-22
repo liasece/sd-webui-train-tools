@@ -63,7 +63,7 @@ def new_ui():
                     with gr.Row():
                         gr_project_version_dataset_gallery = gr.Gallery(value=None, label='Output', show_label=False, elem_id=f"gr_project_version_dataset_gallery").style(grid=4)
                     with gr.Row():
-                        gr_project_version_dataset_label = gr.Textbox(f"Dataset: None", lines=1, interactive = False)
+                        gr_project_version_dataset_label = gr.Textbox(f"Dataset: None", label='Dataset', lines=1, interactive = False)
             with gr.Column():
                 # UI: update dataset
                 with gr.Box():
@@ -139,11 +139,11 @@ def new_ui():
                     with gr.Column():
                         train_batch_size = gr.Number(value=1, label="Batch size", elem_id="train_batch_size", interactive = True)
                         train_num_epochs = gr.Number(value=40, label="Number of epochs", elem_id="train_num_epochs", interactive = True)
-                        train_learning_rate = gr.Number(value=0.0001, label="Learning rate", elem_id="train_learning_rate", interactive = True)
+                        train_learning_rate = gr.Textbox(value="0.0001", label="Learning rate", elem_id="train_learning_rate", interactive = True)
                     with gr.Column():
                         train_net_dim = gr.Number(value=128, label="Net dim (128 ~ 144MB)", elem_id="train_net_dim", interactive = True)
                         train_alpha = gr.Number(value=64, label="Alpha (default is half of Net dim)", elem_id="train_alpha", interactive = True)
-                        train_optimizer_type = gr.Dropdown(label="Optimizer type",value="AdaFactor", choices=["Adam", "AdamW", "AdamW8bit", "Lion", "SGDNesterov", "SGDNesterov8bit", "DAdaptation", "AdaFactor"], interactive = True, elem_id="train_optimizer_type")
+                        train_optimizer_type = gr.Dropdown(label="Optimizer type",value=["Lion"], choices=["Adam", "AdamW", "AdamW8bit", "Lion", "SGDNesterov", "SGDNesterov8bit", "DAdaptation", "AdaFactor"], multiselect = True, interactive = True, elem_id="train_optimizer_type")
                         train_mixed_precision = gr.Dropdown(label="Mixed precision (If your graphics card supports bf16 better)",value="fp16", choices=["fp16", "bf16"], interactive = True, elem_id="train_mixed_precision")
                 with gr.Row():
                     with gr.Column(scale=2):
@@ -183,6 +183,10 @@ def new_ui():
                     preview_refresh_btn = gr.Button(value="Refresh all checkpoint preview info", variant="primary")
                     with gr.Row(elem_id=f"preview_generate_all_preview_btn_container"):
                         preview_generate_all_preview_btn = gr.Button(value="Generate all checkpoint preview", variant="primary", elem_id=f'preview_generate_all_preview_btn')
+            with gr.Box():
+                with gr.Row():
+                    gr_trains_dropdown = gr.Dropdown([], label=f"Trains", value=None, interactive=True)
+                    project_version_trains_refresh_button = ui.ToolButton(value=ui.refresh_symbol, elem_id="project_version_trains_refresh_button")
             for i in range(0, max_list_checkpoint):
                 with gr.Box(visible = False) as train_checkpoint_row:
                     with gr.Row():
@@ -204,9 +208,10 @@ def new_ui():
                                 train_checkpoint_txt2txt_preview_delete_before_generate_list.append(gr.Checkbox(label="Delete preview images before generate", value=True, interactive = True))
                                 train_checkpoint_txt2txt_preview_btn_list.append(gr.Button(value="Generate preview", variant="primary"))
                 train_checkpoint_row_list.append(train_checkpoint_row)
-
         def checkpoint_box_outputs():
             return train_checkpoint_row_list + train_checkpoint_info_name_list + train_checkpoint_info_path_list + train_checkpoint_txt2txt_preview_gallery_list + train_checkpoint_txt2txt_preview_single_image_list
+        def trains_area_outputs():
+            return [gr_trains_dropdown] + checkpoint_box_outputs()
         def dataset_outputs():
             return [gr_project_version_dateset_row, train_row, preview_box, gr_project_version_dataset_gallery, gr_project_version_dataset_label]
         def dataset_config_inputs():
@@ -277,35 +282,35 @@ def new_ui():
         gr_project_dropdown.change(
             fn=on_ui_change_project_click,
             inputs=[gr_project_dropdown],
-            outputs=[gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs()+all_config_inputs(),
+            outputs=[gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+trains_area_outputs()+all_config_inputs(),
         )
         project_refresh_button.click(
             fn = ui_refresh_project,
             inputs = [gr_project_dropdown, gr_version_dropdown],
-            outputs = [gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs()+all_config_inputs(), 
+            outputs = [gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+trains_area_outputs()+all_config_inputs(), 
         )
         create_project_btn.click(
             fn=on_ui_create_project_click,
             _js="ask_for_project_name",
             inputs=dummy_component,
-            outputs=[gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs()+all_config_inputs(),
+            outputs=[gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+trains_area_outputs()+all_config_inputs(),
         )
         # project version
         gr_version_dropdown.change(
             fn=on_ui_change_project_version_click,
             inputs=[gr_project_dropdown, gr_version_dropdown],
-            outputs=[gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs()+all_config_inputs(),
+            outputs=[gr_version_dropdown]+dataset_outputs()+trains_area_outputs()+all_config_inputs(),
         )
         project_version_refresh_button.click(
             fn = ui_refresh_version,
             inputs = [gr_project_dropdown, gr_version_dropdown],
-            outputs = [gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs()+all_config_inputs(), 
+            outputs = [gr_version_dropdown]+dataset_outputs()+trains_area_outputs()+all_config_inputs(), 
         )
         create_project_version_btn.click(
             fn=on_ui_create_project_version_click,
             _js="ask_for_project_version_name",
             inputs=[gr_project_dropdown, dummy_component],
-            outputs=[gr_version_dropdown, gr_project_version_dateset_row]+checkpoint_box_outputs()+all_config_inputs(),
+            outputs=[gr_version_dropdown, gr_project_version_dateset_row]+trains_area_outputs()+all_config_inputs(),
         )
         # dataset
         process_split.change(
@@ -343,7 +348,7 @@ def new_ui():
             outputs = [train_base_model], 
         )
         train_begin_btn.click(
-            fn=wrap_gradio_gpu_call(on_train_begin_click, extra_outputs=[None]*len(checkpoint_box_outputs())+[""]),
+            fn=wrap_gradio_gpu_call(on_train_begin_click, extra_outputs=[None]*len(trains_area_outputs())+[""]),
             _js="on_train_begin_click",
             inputs=[
                 dummy_component,
@@ -355,7 +360,18 @@ def new_ui():
                 # preview view config
                 +preview_config_inputs()
             ,
-            outputs=[train_begin_btn]+checkpoint_box_outputs()+[train_begin_log],
+            outputs=[train_begin_btn]+trains_area_outputs()+[train_begin_log],
+        )
+        # trains area  
+        gr_trains_dropdown.change(
+            fn=on_ui_change_project_version_trains_click,
+            inputs=[gr_project_dropdown, gr_version_dropdown, gr_trains_dropdown],
+            outputs=trains_area_outputs(),
+        )
+        project_version_trains_refresh_button.click(
+            fn = on_ui_refresh_project_version_trains_click,
+            inputs = [gr_project_dropdown, gr_version_dropdown, gr_trains_dropdown],
+            outputs = trains_area_outputs(), 
         )
         # preview
         preview_delete_all_btn.click(
@@ -363,29 +379,32 @@ def new_ui():
             inputs=[
                 gr_project_dropdown, 
                 gr_version_dropdown, 
+                gr_trains_dropdown,
             ],
-            outputs=checkpoint_box_outputs(),
+            outputs=trains_area_outputs(),
         )
         preview_refresh_btn.click(
-            fn=gr_update_checkpoint_list,
+            fn=gr_update_trains_area_list,
             inputs=[
                 gr_project_dropdown, 
                 gr_version_dropdown,
+                gr_trains_dropdown,
             ],
-            outputs=checkpoint_box_outputs(),
+            outputs=trains_area_outputs(),
         )
         preview_generate_all_preview_btn.click(
-            fn=wrap_gradio_gpu_call(on_ui_preview_generate_all_preview_btn_click, extra_outputs=[None]*len(checkpoint_box_outputs())+[""]),
+            fn=wrap_gradio_gpu_call(on_ui_preview_generate_all_preview_btn_click, extra_outputs=[None]*len(trains_area_outputs())+[""]),
             _js="on_ui_preview_generate_all_preview_btn_click",
             inputs=[
                 dummy_component,
                 gr_project_dropdown, 
                 gr_version_dropdown, 
+                gr_trains_dropdown,
                 # preview view config
             ]
                 +preview_config_inputs()
             ,
-            outputs=checkpoint_box_outputs()+[preview_generate_all_preview_log],
+            outputs=trains_area_outputs()+[preview_generate_all_preview_log],
         )
         for i in range(0, max_list_checkpoint):
             # preview button callback
@@ -394,6 +413,7 @@ def new_ui():
                 inputs=[
                     gr_project_dropdown, 
                     gr_version_dropdown, 
+                    gr_trains_dropdown,
                     train_checkpoint_info_name_list[i], 
                     train_checkpoint_info_path_list[i],
                     train_checkpoint_txt2txt_preview_delete_before_generate_list[i],
@@ -410,7 +430,7 @@ def new_ui():
         train_tools.load(
             fn = ui_refresh_project,
             inputs = [gr_project_dropdown, gr_version_dropdown],
-            outputs = [gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+checkpoint_box_outputs()+all_config_inputs(), 
+            outputs = [gr_project_dropdown, gr_project_version_row, gr_version_dropdown]+dataset_outputs()+trains_area_outputs()+all_config_inputs(), 
         )
     return train_tools
 
