@@ -4,7 +4,7 @@ ftfy
 albumentations
 opencv-python
 einops
-diffusers[torch]
+diffusers[torch]==0.10.2
 pytorch-lightning
 bitsandbytes
 tensorboard
