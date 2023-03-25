@@ -111,6 +111,9 @@ def on_train_begin_click(id: str, project: str, version: str,
             cfg.mixed_precision = train_mixed_precision
             cfg.xformers = train_xformers
             cfg.v2 = train_base_on_sd_v2
+            # check if reg path exist
+            if os.path.exists(os.path.join(processed_path, "..", "reg")):
+                cfg.reg_img_folder = os.path.abspath(os.path.join(processed_path, "..", "reg"))
             printD("on_train_begin_click", cfg.__dict__)
             train.train(cfg)
     # generate preview
