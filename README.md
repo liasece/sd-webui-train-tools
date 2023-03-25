@@ -6,7 +6,6 @@ The stable diffusion webui training aid extension helps you quickly and visually
 
 English (TODO) [google translate](https://github-com.translate.goog/liasece/sd-webui-train-tools/blob/main/README.md?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp)
 
-
 ## 预览
 
 <img width="512" alt="" src="https://github.com/liasece/sd-webui-train-tools/blob/main/doc/home.jpg?raw=true">
@@ -62,6 +61,10 @@ English (TODO) [google translate](https://github-com.translate.goog/liasece/sd-w
 <img width="512" alt="" src="https://github.com/liasece/sd-webui-train-tools/blob/main/doc/config_dataset_and_apply.png?raw=true">
 
 你上传的数据源文件会被保留，但是不会真正用于训练。真正被用到训练中的是左边展示的数据。
+
+### 怎样准备正则化图片？
+
+将正则化的图片放在: `outputs/train_tools/projects/[project]/versions/[version]/dataset/reg` 目录下，和 processed 文件夹同级。
 
 ## 训练
 
@@ -135,7 +138,7 @@ English (TODO) [google translate](https://github-com.translate.goog/liasece/sd-w
 
 1. 提高你的训练图片质量。检查你的训练数据，可能是你的训练数据中有一些奇怪的东西。比如你的训练数据中有一些奇怪的图片，或者你的训练数据中有一些奇怪的文字。
 
-2. 如果是训练图片中的对象，而不是画风，在处理数据时勾选 "Use BLIP for caption" 或者 "Use deepbooru for caption"。进阶：想要取得好的效果，你要对这个处理后得到的提示文本进行修剪，默认情况下，这个文本会生成到 `outputs\train_tools\projects\[project]\versions\[version]\dataset\processed\[dataset]\[image name].txt` ，你可以手动修改这个文件，将当中你想保留的特征*去除*（⚠️ 是在这些文本中去除你想保留的特征。如果你想为你的 Lora 保留关键字，那就在这个文本中留下这个关键字），然后重新训练。(这种功能应该集成在工具中，待开发)
+2. 如果是训练图片中的对象，而不是画风，在处理数据时勾选 "Use BLIP for caption" 或者 "Use deepbooru for caption"。进阶：想要取得好的效果，你要对这个处理后得到的提示文本进行修剪，默认情况下，这个文本会生成到 `outputs/train_tools/projects/[project]/versions/[version]/dataset/processed/[dataset]/[image name].txt` ，你可以手动修改这个文件，将当中你想保留的特征*去除*（⚠️ 是在这些文本中去除你想保留的特征。如果你想为你的 Lora 保留关键字，那就在这个文本中留下这个关键字），然后重新训练。(这种功能应该集成在工具中，待开发)
 
 3. 判断是不是训练次数不足，提高训练配置中的 "Number of epochs"。
 
