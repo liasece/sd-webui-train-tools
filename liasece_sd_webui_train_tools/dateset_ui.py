@@ -95,31 +95,34 @@ def on_ui_update_dataset_click(id: str, project: str, version: str, input_train_
     processed_output_path = os.path.join(processed_path, str(train_num_repetitions)+"_"+project)
     os.makedirs(processed_output_path, exist_ok=True)
     os.makedirs(origin_preload_data_path, exist_ok=True)
-    no_alpha_0_picture.rangeAllImage(origin_data_path, origin_preload_data_path)
 
-    modules.textual_inversion.preprocess.preprocess(None, origin_preload_data_path, processed_output_path, 
-        process_width,
-        process_height,
-        preprocess_txt_action,
-        process_flip,
-        process_split,
-        process_caption,
-        process_caption_deepbooru,
-        process_split_threshold,
-        process_overlap_ratio,
-        process_focal_crop,
-        process_focal_crop_face_weight,
-        process_focal_crop_entropy_weight,
-        process_focal_crop_edges_weight,
-        process_focal_crop_debug,
-        process_multicrop,
-        process_multicrop_mindim,
-        process_multicrop_maxdim,
-        process_multicrop_minarea,
-        process_multicrop_maxarea,
-        process_multicrop_objective,
-        process_multicrop_threshold,
-    )
+    try:
+        no_alpha_0_picture.rangeAllImage(origin_data_path, origin_preload_data_path)
+        modules.textual_inversion.preprocess.preprocess(None, origin_preload_data_path, processed_output_path, 
+            process_width,
+            process_height,
+            preprocess_txt_action,
+            process_flip,
+            process_split,
+            process_caption,
+            process_caption_deepbooru,
+            process_split_threshold,
+            process_overlap_ratio,
+            process_focal_crop,
+            process_focal_crop_face_weight,
+            process_focal_crop_entropy_weight,
+            process_focal_crop_edges_weight,
+            process_focal_crop_debug,
+            process_multicrop,
+            process_multicrop_mindim,
+            process_multicrop_maxdim,
+            process_multicrop_minarea,
+            process_multicrop_maxarea,
+            process_multicrop_objective,
+            process_multicrop_threshold,
+        )
+    except Exception as e:
+        printD("dataset update error", e)
 
     return get_project_version_dataset_box_update(project, version)+[""]
 
@@ -129,11 +132,12 @@ def get_project_version_dataset_box_update(project: str, version: str):
         return [ gr.Row.update(visible=False)]*3+[None]*2
     dataset_images = readImages(processed_output_path, 1)
     label_head = f"Dataset: {len(dataset_images)} images"
-    label = "\n".join(readPathSubDirPathList(processed_output_path))
+    sub_dir_list = readPathSubDirPathList(processed_output_path)
+    label = "\n".join(sub_dir_list)
     return [
         gr.Row.update(visible=version!=""), # gr_project_version_dateset_row
         gr.Row.update(visible=version!=""), # train_row
         gr.Box.update(visible=version!=""), # preview_box
         gr.Gallery.update(value=dataset_images), # gr_project_version_dataset_gallery
-        gr.Textbox.update(value=f"{label_head}\n{label}"), # gr_project_version_dataset_label
+        gr.Textbox.update(value=f"{label_head}\n{label}", lines=1+len(sub_dir_list)), # gr_project_version_dataset_label
     ]

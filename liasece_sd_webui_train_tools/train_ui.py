@@ -115,7 +115,10 @@ def on_train_begin_click(id: str, project: str, version: str,
             if os.path.exists(os.path.join(processed_path, "..", "reg")):
                 cfg.reg_img_folder = os.path.abspath(os.path.join(processed_path, "..", "reg"))
             printD("on_train_begin_click", cfg.__dict__)
-            train.train(cfg)
+            try:
+                train.train(cfg)
+            except Exception as e:
+                printD("train.train error", e)
     # generate preview
     if train_finish_generate_all_checkpoint_preview:
         return [None]+on_ui_preview_generate_all_preview_btn_click(id, project, version, train_name,

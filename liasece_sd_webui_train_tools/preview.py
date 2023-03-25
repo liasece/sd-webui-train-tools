@@ -111,20 +111,17 @@ def preview_checkpoint(save_file_path: str, checkpoint_name: str, checkpoint_pat
         0, # margin_size
     ]
     printD(f"txt2img: {preview_txt2img_prompt}", args)
-    processed = runner.run(p, *args)
-
-    if processed is None:
-        processed = process_images(p)
-
-    p.close()
-
-    shared.total_tqdm.clear()
-
-    generation_info_js = processed.js()
-    if opts.samples_log_stdout:
+    try:
+        processed = runner.run(p, *args)
+        if processed is None:
+            processed = process_images(p)
+        p.close()
+        shared.total_tqdm.clear()
+        generation_info_js = processed.js()
         printD(generation_info_js)
-
-    if opts.do_not_show_images:
-        processed.images = []
+        if opts.do_not_show_images:
+            processed.images = []
+    except Exception as e:
+        printD(f"Error while processing {p.prompt}", e)
 
     shared.cmd_opts.lora_dir = lora_dir
