@@ -94,6 +94,44 @@ English (TODO) [google translate](https://github-com.translate.goog/liasece/sd-w
 
 在 stable-diffusion-webui 的运行命令行中可以看到训练的过程及进度。
 
+### 一次训练多种参数训练，充分利用你睡觉时的 GPU
+
+有时，一套训练配置可能并不是最优的。等待你的训练结束然后再重新开始训练，这样的效率太低了。因此，你可以一次性配置多种参数，点击一次训练，自动组合不同的参数进行训练。
+
+你可以直接使用 `,` 分隔不同的参数，如果这个参数支持多选，例如：
+
+<img width="512" alt="" src="https://github.com/liasece/sd-webui-train-tools/blob/main/doc/batch_training_parameters.png?raw=true">
+
+1. 一次性训练学习率为 `0.0002,0.0003,0.0004,0.0005` 的模型。
+
+2. 一次性训练优化器为 `Lion,AdamW` 的模型。
+
+> 如果你认为还有别的参数值得多选，可以提交 Issue 或者 Pull request 告诉我。
+
+在这个例子中，你一次性训练了 8 个模型。分别为： `Lion,0.0002` 、 `Lion,0.0003` 、 `Lion,0.0004` 、 `Lion,0.0005` 、 `AdamW,0.0002` 、 `AdamW,0.0003` 、 `AdamW,0.0004` 、 `AdamW,0.0005` 。
+
+训练完成后，你可以在 [预览训练结果](#预览训练结果) 中看到一个下拉框：
+
+<img width="512" alt="" src="https://github.com/liasece/sd-webui-train-tools/blob/main/doc/trains_select.png?raw=true">
+
+意思很明显，这个命名如 `v1-5-pruned-emaonly-bs-10-ep-10-op-Lion-lr-0_0001-net-128-ap-64` 表示：
+
+1. 这个训练结果集基于 `v1-5-pruned-emaonly` 基础模型。
+
+2. 训练时的 batch size 为 10。
+
+3. 训练时的 epoch 为 10。
+
+4. 训练时的优化器为 Lion。
+
+5. 训练时的学习率为 0.0001。
+
+6. 训练时的 Net dim 大小为 128。
+
+7. 训练时的 Alpha 为 64。
+
+每个训练参数的结果集底下都会有基于 `Save every n epochs` 的检查点。即使你在某个版本中一直调整训练参数去训练，你也基本不会丢失你的训练结果。
+
 ## 预览训练结果
 
 不同的训练数据/训练参数/训练次数都会导致训练的效果不一样。你可以在这里预览训练结果。方便地挑选较好的结果。
