@@ -50,6 +50,20 @@ def readPathSubDirNameList(path: str, level: int = 0) -> list[str]:
             res.append(file)
     return res
 
+def readPathSubDirPathList(path: str, level: int = 0) -> list[str]:
+    res = []
+    if not os.path.isdir(path):
+        return res
+
+    for file in os.listdir(path):
+        file_path = os.path.join(path, file)
+        if level > 0:
+            if os.path.isdir(file_path):
+                res += readPathSubDirPathList(file_path, level-1)
+        elif os.path.isdir(file_path):
+            res.append(os.path.abspath(file_path))
+    return res
+
 # range all checkpoint in folder, [(name, path)]
 def readCheckpoints(inputPath: str, level: int = 0) -> list[(str, str)]:
     res = []

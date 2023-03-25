@@ -62,6 +62,12 @@ English (TODO) [google translate](https://github-com.translate.goog/liasece/sd-w
 
 你上传的数据源文件会被保留，但是不会真正用于训练。真正被用到训练中的是左边展示的数据。
 
+### 怎样管理这些图片生成的 tag?
+
+我们推荐你使用另外的一个扩展 [sd-webui-dataset-tag-editor](https://github.com/toshiaki1729/stable-diffusion-webui-dataset-tag-editor) ，这个插件做得很优秀！能够很好地管理数据集图片的 tag。
+
+为了能让你更方便地使用这个插件，我们在数据集下方显示了这个数据集的绝对路径，你可以直接复制这个路径粘贴到这个插件的 Dataset directory 中。
+
 ### 怎样准备正则化图片？
 
 将正则化的图片放在: `outputs/train_tools/projects/[project]/versions/[version]/dataset/reg` 目录下，和 processed 文件夹同级。
