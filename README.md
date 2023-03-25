@@ -4,7 +4,8 @@ The stable diffusion webui training aid extension helps you quickly and visually
 
 一个 stable-diffusion-webui 的训练辅助扩展，可以帮助你快速、直观地训练 Lora 等模型。
 
-English (TODO)
+English (TODO) [google translate](https://github-com.translate.goog/liasece/sd-webui-train-tools/blob/main/README.md?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en&_x_tr_pto=wapp)
+
 
 ## 预览
 
