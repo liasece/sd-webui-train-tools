@@ -196,7 +196,7 @@ English (TODO) [google translate](https://github-com.translate.goog/liasece/sd-w
 
 其中：
 
-n: 训练数据集图片数量 "Train number of repetitions" （-1 时表示训练图片数为（上传图片数\*4））。大多数情况下你不需要修改默认值，你可以改成你上传的图片数量的 k 倍
+n: 训练数据集图片数量 "Train number of repetitions" （-1 时表示训练图片数为 min(512 / 上传图片数, 4) ）。大多数情况下你不需要修改默认值，你可以改成你上传的图片数量的 k 倍
 
 i: 你的显卡性能
 

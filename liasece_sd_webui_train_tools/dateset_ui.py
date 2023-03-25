@@ -91,7 +91,10 @@ def on_ui_update_dataset_click(id: str, project: str, version: str, input_train_
         # copy to dataset path
         shutil.copyfile(f.name, file_path)
     if train_num_repetitions < 0:
-        train_num_repetitions = len(input_train_data_set_files)*4
+        if len(input_train_data_set_files) > 0:
+            train_num_repetitions = int(512 / len(input_train_data_set_files))
+        if train_num_repetitions <= 4:
+            train_num_repetitions = 4
     processed_output_path = os.path.join(processed_path, str(train_num_repetitions)+"_"+project)
     os.makedirs(processed_output_path, exist_ok=True)
     os.makedirs(origin_preload_data_path, exist_ok=True)
