@@ -60,7 +60,17 @@ def ui_refresh_project(now_project: str, now_project_version: str):
         gr.Dropdown.update(value=to_project_version, choices=project_version_list),
     ]+get_project_version_dataset_box_update(to_project, to_project_version)+gr_update_trains_area_list(to_project, to_project_version, default_project_version_train)+load_gr_update(to_project, to_project_version)
 
-def on_ui_create_project_click(new_project_name: str):
+def on_ui_create_project_click(new_project_name):
+    """
+    Parameters:
+        new_project_name: The name of the project created. This should be of type str, but due to the limitations of _js in different gradio versions, this value may be an array. Our plugin needs to be compatible with multiple versions of webui, so we need to make some judgments here.
+    """
+    # if new_project_name is list, convert to str
+    if isinstance(new_project_name, list):
+        if len(new_project_name) > 0:
+            new_project_name = new_project_name[0]
+        else:
+            new_project_name = ""
     if new_project_name == "" or new_project_name == None:
         return [None]*4
     # check the project name not exists
