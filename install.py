@@ -6,6 +6,7 @@ my_path = os.path.dirname(os.path.realpath(__file__))
 
 with git.Repo(my_path) as repo:
     repo.remote().fetch()
+    repo.git.submodule("update", "--init", "--recursive", "--force")
     for submodule in repo.submodules:
         submodule.update(init=True, recursive=True, force=True, keep_going=True)
 
