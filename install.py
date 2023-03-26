@@ -4,8 +4,10 @@ import git
 
 my_path = os.path.dirname(os.path.realpath(__file__))
 
-repo = git.Repo(my_path)
-repo.git.submodule("update", "--init", "--recursive")
+with git.Repo(my_path) as repo:
+    repo.remote().fetch()
+    for submodule in repo.submodules:
+        submodule.update(init=True, recursive=True, force=True, keep_going=True)
 
 python_requirements_file = os.path.join(my_path, "requirements.txt")
 
