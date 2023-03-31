@@ -156,6 +156,14 @@ English (TODO) [google translate](https://github-com.translate.goog/liasece/sd-w
 
 ## 本工具使用问题
 
+### 出现了一些错误，我该怎么办？
+
+1. 禁用其他插件，防止依赖冲突。
+
+2. 重启 stable-diffusion-webui。
+
+3. 如果还是不行，提交 Issue 告诉我。
+
 ### 为什么我点上传数据集后没有反应？
 
 上传数据集后，如果你的一些预处理参数需要下载额外模型，那么网页上会有一段时间没有反应，这是正常的。你可以在命令行中看到进度。
