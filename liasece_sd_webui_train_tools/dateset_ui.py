@@ -6,6 +6,8 @@ import shutil
 from PIL import Image
 import tempfile
 import modules
+import sys
+import traceback
 from liasece_sd_webui_train_tools.util import *
 from liasece_sd_webui_train_tools import no_alpha_0_picture
 
@@ -126,6 +128,7 @@ def on_ui_update_dataset_click(id: str, project: str, version: str, input_train_
         )
     except Exception as e:
         printD("dataset update error", e)
+        print(traceback.format_exc(), file=sys.stderr)
 
     return get_project_version_dataset_box_update(project, version)+[""]
 

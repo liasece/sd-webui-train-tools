@@ -11,6 +11,8 @@ from modules.ui import plaintext_to_html
 from liasece_sd_webui_train_tools.util import *
 import time
 import os
+import sys
+import traceback
 
 import scripts.xyz_grid as xyz_grid
 
@@ -123,5 +125,6 @@ def preview_checkpoint(save_file_path: str, checkpoint_name: str, checkpoint_pat
             processed.images = []
     except Exception as e:
         printD(f"Error while processing {p.prompt}", e)
+        print(traceback.format_exc(), file=sys.stderr)
 
     shared.cmd_opts.lora_dir = lora_dir

@@ -2,6 +2,8 @@
 
 import gradio as gr
 import os
+import sys
+import traceback
 from modules import shared
 from modules import sd_models
 from liasece_sd_webui_train_tools.util import *
@@ -119,6 +121,7 @@ def on_train_begin_click(id: str, project: str, version: str,
                 train.train(cfg)
             except Exception as e:
                 printD("train.train error", e)
+                print(traceback.format_exc(), file=sys.stderr)
     # generate preview
     if train_finish_generate_all_checkpoint_preview:
         return [None]+on_ui_preview_generate_all_preview_btn_click(id, project, version, train_name,
