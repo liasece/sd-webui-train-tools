@@ -196,24 +196,42 @@ English (TODO) [google translate](https://github-com.translate.goog/liasece/sd-w
 
 4. 提高训练配置中的 "Batch size"。这对显存容量的要求很高。24G 显存的显卡可以最高选到 10 左右。
 
+### 为什么我的训练结果不拟合（不像训练图）？
+
+参考上面这个问题。
+
 ### 为什么我的训练很慢？
 
 训练过程需要的时间大致等于：
 
-(n \* [Number of epochs]) / ([Batch size] \* i)
+C \* (n \* [Number of epochs]) / ([Batch size] \* p)
 
 其中：
 
+C: 常数，跟基础模型和训练数据集大小等因素有关
+
 n: 训练数据集图片数量 "Train number of repetitions" （-1 时表示训练图片数为 min(512 / 上传图片数, 4) ）。大多数情况下你不需要修改默认值，你可以改成你上传的图片数量的 k 倍
 
-i: 你的显卡性能
+p: 你的显卡性能
 
 所以，如果想要提高训练速度，你可以：
 
 1. 提高 "Batch size"。这对显存容量的要求很高。24G 显存的显卡可以最高选到 10 左右。
 
-2. 降低 "Number of epochs"。这会导致训练效果变差。
+2. 降低 "Number of epochs"。这会导致训练效果变差。（相当于降低训练步数）
 
-3. 降低 "Train number of repetitions"。这会导致训练效果变差。
+3. 降低 "Train number of repetitions"。这会导致训练效果变差。（相当于降低训练步数）
 
-4. 买个算力更高的显卡。
+4. 使用算力更高的显卡。
+
+### 正则化（reg）图像目录找不到
+
+正确的 reg 子目录结构应该是和待训练数据拥有同样关键词的目录，例如：
+
+dataset/processed/40_object
+
+对应的正则化图片目录为：
+
+dataset/reg/10_object
+
+必须在 reg 目录下创建一个和待训练数据拥有同样关键词的目录，而不是直接放到/reg 下就可以了。
