@@ -235,3 +235,13 @@ dataset/processed/40_object
 dataset/reg/10_object
 
 必须在 reg 目录下创建一个和待训练数据拥有同样关键词的目录，而不是直接放到/reg 下就可以了。
+
+### 页面一直转圈，加载不出来图片？
+
+已知新版 gradio 在数据传输量太大时会出现这个问题，此时可以清除部分预览图，减少页面上图片数量。
+
+工具也作出了修改，如果 Lora 检查点超过 10 个，后面的检查点将不再显示。
+
+如果仍然存在疑问，可以参考 [webui 这里](https://github.com/AUTOMATIC1111/stable-diffusion-webui/commit/22bcc7be) 的讨论。
+
+如果你只想解决问题，可以尝试 [这个 issues](https://github.com/liasece/sd-webui-train-tools/issues/4) 的方案，在启动 webui 时添加参数：`--no-gradio-queue`

@@ -24,3 +24,4 @@ huggingface-hub
 GitPython
 toml
 voluptuous
+tabulate

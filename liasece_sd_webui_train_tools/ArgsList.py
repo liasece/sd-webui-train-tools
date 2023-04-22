@@ -8,6 +8,18 @@
 """
 import os
 from typing import Union
+import argparse
+from typing import Union
+import gc
+import torch
+
+import liasece_sd_webui_train_tools.PythonContextWarper as pc
+with pc.PythonContextWarper(
+        to_module_path= os.path.abspath(os.path.join(os.path.dirname(__file__), "sd_scripts")), 
+        path_include= os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), 
+        sub_module="library",
+    ):
+    import liasece_sd_webui_train_tools.sd_scripts.train_network as train_network
 
 class ArgStore:
     def __init__(self):
@@ -181,6 +193,38 @@ class ArgStore:
     def convert_args_to_dict(self):
         return self.__dict__
 
+    def create_args(self) -> argparse.Namespace:
+        parser = Parser()
+        args = self.convert_args_to_dict()
+        multi_path = args['multi_run_folder']
+        if multi_path and ensure_path(multi_path, "multi_run_folder"):
+            for file in os.listdir(multi_path):
+                if os.path.isdir(file) or file.split(".")[-1] != "json":
+                    continue
+                args = self.convert_args_to_dict()
+                args['json_load_skip_list'] = None
+                try:
+                    ensure_file_paths(args)
+                except FileNotFoundError:
+                    print("failed to find one or more folders or paths, skipping.")
+                    continue
+                if args['tag_occurrence_txt_file']:
+                    get_occurrence_of_tags(args)
+                args = parser.create_args(self.change_dict_to_internal_names(args))
+                train_network.train(args)
+                gc.collect()
+                torch.cuda.empty_cache()
+                if not os.path.exists(os.path.join(multi_path, "complete")):
+                    os.makedirs(os.path.join(multi_path, "complete"))
+                os.rename(os.path.join(multi_path, file), os.path.join(multi_path, "complete", file))
+            print("completed all training")
+            quit()
+        ensure_file_paths(args)
+        if args['tag_occurrence_txt_file']:
+            get_occurrence_of_tags(args)
+        args = parser.create_args(self.change_dict_to_internal_names(args))
+        return args
+
     def change_dict_to_internal_names(self, dic: dict):
         internal_names = {'base_model': 'pretrained_model_name_or_path', 'img_folder': 'train_data_dir',
                           'shuffle_captions': 'shuffle_caption', 'train_resolution': 'resolution',
@@ -236,3 +280,145 @@ def find_max_steps(args: dict) -> int:
         total_steps += (num_repeats * imgs)
     total_steps = int((total_steps / args["batch_size"]) * args["num_epochs"])
     return total_steps
+
+def ensure_file_paths(args: dict) -> None:
+    failed_to_find = False
+    folders_to_check = ['img_folder', 'output_folder', 'save_json_folder', 'multi_run_folder',
+                        'reg_img_folder', 'log_dir']
+    for folder in folders_to_check:
+        if folder in args and args[folder] is not None:
+            if not ensure_path(args[folder], folder):
+                failed_to_find = True
+
+    if not ensure_path(args['base_model'], 'base_model', {"safetensors", "ckpt"}):
+        failed_to_find = True
+    if args['load_json_path'] is not None and not ensure_path(args['load_json_path'], 'load_json_path', {'json'}):
+        failed_to_find = True
+    if args['vae'] is not None and not ensure_path(args['vae'], 'vae', {'pt'}):
+        failed_to_find = True
+    if failed_to_find:
+        raise FileNotFoundError()
+
+
+def get_occurrence_of_tags(args):
+    extension = args['caption_extension']
+    img_folder = args['img_folder']
+    output_folder = args['output_folder']
+    occurrence_dict = {}
+    print(img_folder)
+    for folder in os.listdir(img_folder):
+        print(folder)
+        if not os.path.isdir(os.path.join(img_folder, folder)):
+            continue
+        for file in os.listdir(os.path.join(img_folder, folder)):
+            if not os.path.isfile(os.path.join(img_folder, folder, file)):
+                continue
+            ext = os.path.splitext(file)[1]
+            if ext != extension:
+                continue
+            get_tags_from_file(os.path.join(img_folder, folder, file), occurrence_dict)
+    if not args['sort_tag_occurrence_alphabetically']:
+        output_list = {k: v for k, v in sorted(occurrence_dict.items(), key=lambda item: item[1], reverse=True)}
+    else:
+        output_list = {k: v for k, v in sorted(occurrence_dict.items(), key=lambda item: item[0])}
+    name = args['change_output_name'] if args['change_output_name'] else "last"
+    with open(os.path.join(output_folder, f"{name}.txt"), "w") as f:
+        f.write(f"Below is a list of keywords used during the training of {args['change_output_name']}:\n")
+        for k, v in output_list.items():
+            f.write(f"[{v}] {k}\n")
+    print(f"Created a txt file named {name}.txt in the output folder")
+
+
+def get_tags_from_file(file, occurrence_dict):
+    f = open(file)
+    temp = f.read().replace(", ", ",").split(",")
+    f.close()
+    for tag in temp:
+        if tag in occurrence_dict:
+            occurrence_dict[tag] += 1
+        else:
+            occurrence_dict[tag] = 1
+
+def ensure_path(path, name, ext_list=None) -> bool:
+    if ext_list is None:
+        ext_list = {}
+    folder = len(ext_list) == 0
+    if path is None or not os.path.exists(path):
+        print(f"Failed to find {name}, Please make sure path is correct.")
+        quit()
+    elif folder and os.path.isfile(path):
+        print(f"Path given for {name} is that of a file, please select a folder.")
+        quit()
+    elif not folder and os.path.isdir(path):
+        print(f"Path given for {name} is that of a folder, please select a file.")
+        quit()
+    elif not folder and path.split(".")[-1] not in ext_list:
+        print(f"Found a file for {name}, however it wasn't of the accepted types: {ext_list}")
+        quit()
+    return True
+
+
+class Parser:
+    def __init__(self) -> None:
+        self.parser = train_network.setup_parser()
+
+    def create_args(self, args: dict) -> argparse.Namespace:
+        remove_epochs = False
+        args_list = []
+        skip_list = ["save_json_folder", "load_json_path", "multi_run_folder", "json_load_skip_list",
+                     "tag_occurrence_txt_file", "sort_tag_occurrence_alphabetically", "save_json_only",
+                     "warmup_lr_ratio", "optimizer_args", "locon_dim", "locon_alpha", "locon", "lyco", "network_args",
+                     "resolution", "height_resolution"]
+        for key, value in args.items():
+            if not value:
+                continue
+            if key in skip_list:
+                continue
+            if key == "max_train_steps":
+                remove_epochs = True
+            if isinstance(value, bool):
+                args_list.append(f"--{key}")
+            else:
+                args_list.append(f"--{key}={value}")
+
+        name_space = self.parser.parse_args(args_list)
+        if 'height_resolution' in args and args['height_resolution']:
+            name_space.resolution = f"{args['resolution']},{args['height_resolution']}"
+        else:
+            name_space.resolution = f"{args['resolution']}"
+
+        if remove_epochs:
+            name_space.max_train_epochs = None
+
+        if 'optimizer_args' in args:
+            name_space.optimizer_args = []
+            for key, value in args['optimizer_args'].items():
+                if key == "betas" and args['optimizer_type'] in {"AdaFactor", "SGDNesterov", "SGDNesterov8bit"}:
+                    continue
+                name_space.optimizer_args.append(f"{key}={value}")
+
+        if args['optimizer_type'] == "DAdaptation":
+            name_space.optimizer_args.append("decouple=True")
+
+        if "use_8bit_adam" in args and args['use_8bit_adam'] is True:
+            name_space.optimizer_type = ""
+        if "use_lion_optimizer" in args and args['use_lion_optimizer'] is True:
+            name_space.optimizer_type = ""
+
+        if args['locon_dim']:
+            if not args['network_args']:
+                args['network_args'] = dict()
+            args['network_args']['conv_dim'] = args['locon_dim']
+        if args['locon_alpha']:
+            if not args['network_args']:
+                args['network_args'] = dict()
+            args['network_args']['conv_alpha'] = args['locon_alpha']
+
+        lyco = 'lyco' in args and args['lyco'] is True
+        name_space.network_module = 'lycoris.kohya' if lyco else 'networks.lora'
+
+        if 'network_args' in args and args['network_args']:
+            name_space.network_args = []
+            for key, value in args['network_args'].items():
+                name_space.network_args.append(f"{key}={value}")
+        return name_space

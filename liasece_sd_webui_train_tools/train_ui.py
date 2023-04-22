@@ -94,6 +94,9 @@ def on_train_begin_click(id: str, project: str, version: str,
     train_learning_rate_list = np.fromstring( train_learning_rate, dtype=np.float64, sep=',' )
     for train_learning_rate_item in train_learning_rate_list:
         for train_optimizer_type_item in train_optimizer_type:
+            if train_base_model_name == "":
+                printD("unknown base model", train_base_model_name)
+                continue
             train_name = (train_base_model_name+"-bs-"+str(int(train_batch_size))+"-ep-"+str(int(train_num_epochs))+"-op-"+str(train_optimizer_type_item)+"-lr-"+str(float(train_learning_rate_item))+"-net-"+str(int(train_net_dim))+"-ap-"+str(int(train_alpha))).replace(" ", "").replace(".", "_")
             checkpoint_save_path = get_project_version_trains_checkpoint_path(project, version, train_name)
             os.makedirs(checkpoint_save_path, exist_ok=True)

@@ -17,7 +17,7 @@ from liasece_sd_webui_train_tools.config_file import *
 # from liasece_sd_webui_train_tools.dateset_ui import *
 # from liasece_sd_webui_train_tools.train_ui import *
 
-max_list_checkpoint = 100
+max_list_checkpoint = 10
 
 # list checkpoint, [(name, path)]
 def list_checkpoint(project: str, version: str, train_name: str) -> list[(str, str)]:
@@ -38,7 +38,14 @@ def get_checkpoint_preview_images(project: str, version: str, train_name: str, c
     checkpoint_preview_images_path = get_checkpoint_preview_images_path(project, version, train_name, checkpoint_name)
     if checkpoint_preview_images_path == "":
         return []
-    return readImages(checkpoint_preview_images_path,level=3, include_pre_level=True, endswith=".png")
+    # printD(f"in get_checkpoint_preview_images: project: {project}-{version}-{train_name}-{checkpoint_name}")
+    xyz_grid = readImages(checkpoint_preview_images_path, level=3, include_pre_level=True, endswith=".png", startswith="xyz_grid-")
+    sub_grid = readImages(checkpoint_preview_images_path, level=3, include_pre_level=True, endswith=".png", startswith="grid-")
+    all_img = readImages(checkpoint_preview_images_path, level=3, include_pre_level=True, endswith=".png")
+    printD(f"in get_checkpoint_preview_images: project: {project} {version} {train_name} {checkpoint_name}: xyz_grid {len(xyz_grid)}, sub_grid {len(sub_grid)}, all_img {len(all_img)}")
+    if len(sub_grid) + len(xyz_grid) != len(all_img):
+        return all_img
+    return xyz_grid
 
 def get_checkpoint_preview_images_update(project: str, version: str, train_name: str, checkpoint_name: str):
     images = get_checkpoint_preview_images(project, version, train_name, checkpoint_name)

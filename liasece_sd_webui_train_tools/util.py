@@ -9,31 +9,42 @@ def printD(*values: object):
     print(f"Train Tools:", *values)
 
 # range all image in folder
-def readImages(inputPath: str, level: int = 0, include_pre_level: bool = False, endswith :str | list[str] = [".png",".jpg",".jpeg",".bmp",".webp"]) -> list[Image.Image]:
+def readImages(inputPath: str, level: int = 0, include_pre_level: bool = False, endswith :str | list[str] = [".png",".jpg",".jpeg",".bmp",".webp"], startswith: str | list[str] = None) -> list[Image.Image]:
     res = []
     if not os.path.isdir(inputPath):
         return res
 
     file_path_list = []
-    for file in os.listdir(inputPath):
+    for file_name in os.listdir(inputPath):
         if level > 0:
-            if os.path.isdir(os.path.join(inputPath, file)):
-                res += readImages(os.path.join(inputPath, file), level-1, include_pre_level, endswith)
+            if os.path.isdir(os.path.join(inputPath, file_name)):
+                res += readImages(os.path.join(inputPath, file_name), level-1, include_pre_level, endswith, startswith)
         if level <= 0 or include_pre_level:
             ok = False
             if isinstance(endswith, list):
                 for e in endswith:
-                    if file.endswith(e):
+                    if file_name.endswith(e):
                         ok = True
                         break
             else:
-                if file.endswith(endswith):
+                if file_name.endswith(endswith):
                     ok = True
+            if startswith is not None:
+                startswith_ok = False
+                if isinstance(startswith, list):
+                    for e in startswith:
+                        if file_name.startswith(e):
+                            startswith_ok = True
+                            break
+                else:
+                    if file_name.startswith(startswith):
+                        startswith_ok = True
+                ok = ok and startswith_ok
             if ok:
-                file_path_list.append(file)
+                file_path_list.append(file_name)
     file_path_list = sorted([x for x in file_path_list])
-    for file in file_path_list:
-        img = Image.open(os.path.join(inputPath, file))
+    for file_name in file_path_list:
+        img = Image.open(os.path.join(inputPath, file_name))
         res.append(img)
     return res
 
