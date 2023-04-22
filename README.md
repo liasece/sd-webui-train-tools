@@ -150,6 +150,22 @@ English (TODO) [google translate](https://github-com.translate.goog/liasece/sd-w
 
 这里还有一些类似于 txt2img 中 xyz plot 的功能，默认值已经可以满足一般情况。这里的部分值是可以多选的，值之间用 "," 分隔。
 
+<img width="512" alt="" src="https://github.com/liasece/sd-webui-train-tools/blob/main/doc/checkpoint_preview.jpg?raw=true">
+
+1. 要在检查点上预览的关键词。和 txt2img 中的含义基本一致。
+
+2. 如果显存允许，你可以设置成 4 或者 9 等 n\*n 的值，这样可以在一个图中预览更多的结果。
+
+3. 这里是你想为每个检查点预测几个 Lora 权重，用 "," 分隔。
+
+4. 点击这个按钮，将为下面列表中的所有检查点执行相同的 seed 的预测图片生成，这样可以更方便地对比不同检查点的效果。
+
+5. 这个检查点的保存路径。如果你认为它的结果好，可以去这里找到它。
+
+6. 类似于 xyz 脚本，这一张图列出了所有参数下它的预测结果。
+
+7. 每个检查点下都有自己的预测按钮，点击它就会只用这个检查点生成图片。
+
 ## 保存训练结果
 
 目前没有在 UI 中提供下载模型的功能，你可以去你 stable-diffusion-webui > output > train_tools > 工程名 > versions > 版本名 > checkpoints 中找到你训练好的模型。
