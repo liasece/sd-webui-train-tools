@@ -167,7 +167,7 @@ def new_ui():
                         preview_width = gr.Slider(minimum=64, maximum=2048, step=8, label="Width", value=512, elem_id="preview_width", interactive = True)
                         preview_height = gr.Slider(minimum=64, maximum=2048, step=8, label="Height", value=512, elem_id="preview_height", interactive = True)
                         preview_batch_count = gr.Slider(minimum=1, step=1, label='Batch count', value=1, elem_id="preview_batch_count", interactive = True)
-                        preview_batch_size = gr.Slider(minimum=1, maximum=8, step=1, label='Batch size', value=1, elem_id="preview_batch_size", interactive = True)
+                        preview_batch_size = gr.Slider(minimum=1, step=1, label='Batch size', value=1, elem_id="preview_batch_size", interactive = True)
                     with gr.Column():
                         preview_sampling_method = gr.Dropdown(label='Sampling method', choices=[x.name for x in sd_samplers.samplers], value=[sd_samplers.samplers[0].name],multiselect = True, elem_id="preview_sampling_method", interactive = True)
                         preview_sampling_steps = gr.Textbox(label="Sampling steps", value="28",placeholder="like 20,24,28", elem_id="preview_sampling_steps", interactive = True)
