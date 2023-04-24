@@ -39,9 +39,9 @@ def get_checkpoint_preview_images(project: str, version: str, train_name: str, c
     if checkpoint_preview_images_path == "":
         return []
     # printD(f"in get_checkpoint_preview_images: project: {project}-{version}-{train_name}-{checkpoint_name}")
-    xyz_grid = readImages(checkpoint_preview_images_path, level=3, include_pre_level=True, endswith=".png", startswith="xyz_grid-")
-    sub_grid = readImages(checkpoint_preview_images_path, level=3, include_pre_level=True, endswith=".png", startswith="grid-")
-    all_img = readImages(checkpoint_preview_images_path, level=3, include_pre_level=True, endswith=".png")
+    xyz_grid = readImagePaths(checkpoint_preview_images_path, level=3, include_pre_level=True, endswith=".png", startswith="xyz_grid-")
+    sub_grid = readImagePaths(checkpoint_preview_images_path, level=3, include_pre_level=True, endswith=".png", startswith="grid-")
+    all_img = readImagePaths(checkpoint_preview_images_path, level=3, include_pre_level=True, endswith=".png")
     printD(f"in get_checkpoint_preview_images: project: {project} {version} {train_name} {checkpoint_name}: xyz_grid {len(xyz_grid)}, sub_grid {len(sub_grid)}, all_img {len(all_img)}")
     if len(sub_grid) + len(xyz_grid) != len(all_img):
         return all_img
@@ -215,6 +215,7 @@ def on_ui_preview_generate_all_preview_btn_click(id: str, project: str, version:
 
 def wait_image_save_finished():
     if hasattr(images,"is_async_save_image_finished"):
+        printD(f"waiting for async save image finished...")
         # wait for async save to finish
         while not images.is_async_save_image_finished():
             time.sleep(0.5)

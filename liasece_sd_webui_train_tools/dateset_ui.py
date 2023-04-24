@@ -136,7 +136,7 @@ def get_project_version_dataset_box_update(project: str, version: str):
     processed_output_path = get_project_version_dataset_processed_path(project, version)
     if processed_output_path == "":
         return [ gr.Row.update(visible=False)]*3+[None]*2
-    dataset_images = readImages(processed_output_path, 1)
+    dataset_images = readImagePaths(processed_output_path, 1)
     label_head = f"Dataset: {len(dataset_images)} images"
     sub_dir_list = readPathSubDirPathList(processed_output_path)
     label = "\n".join(sub_dir_list)

@@ -11,6 +11,14 @@ def printD(*values: object):
 # range all image in folder
 def readImages(inputPath: str, level: int = 0, include_pre_level: bool = False, endswith :str | list[str] = [".png",".jpg",".jpeg",".bmp",".webp"], startswith: str | list[str] = None) -> list[Image.Image]:
     res = []
+    paths = readImagePaths(inputPath, level, include_pre_level, endswith, startswith)
+    for path in paths:
+        img = Image.open(path)
+        res.append(img)
+    return res
+    
+def readImagePaths(inputPath: str, level: int = 0, include_pre_level: bool = False, endswith :str | list[str] = [".png",".jpg",".jpeg",".bmp",".webp"], startswith: str | list[str] = None) -> list[str]:
+    res = []
     if not os.path.isdir(inputPath):
         return res
 
@@ -18,7 +26,7 @@ def readImages(inputPath: str, level: int = 0, include_pre_level: bool = False, 
     for file_name in os.listdir(inputPath):
         if level > 0:
             if os.path.isdir(os.path.join(inputPath, file_name)):
-                res += readImages(os.path.join(inputPath, file_name), level-1, include_pre_level, endswith, startswith)
+                res += readImagePaths(os.path.join(inputPath, file_name), level-1, include_pre_level, endswith, startswith)
         if level <= 0 or include_pre_level:
             ok = False
             if isinstance(endswith, list):
@@ -44,8 +52,7 @@ def readImages(inputPath: str, level: int = 0, include_pre_level: bool = False, 
                 file_path_list.append(file_name)
     file_path_list = sorted([x for x in file_path_list])
     for file_name in file_path_list:
-        img = Image.open(os.path.join(inputPath, file_name))
-        res.append(img)
+        res.append(str(os.path.join(inputPath, file_name)))
     return res
 
 def readPathSubDirNameList(path: str, level: int = 0) -> list[str]:
