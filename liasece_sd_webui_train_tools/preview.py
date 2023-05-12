@@ -14,7 +14,7 @@ import os
 import sys
 import traceback
 
-import scripts.xyz_grid as xyz_grid
+import liasece_sd_webui_train_tools.tools.xyz_grid as xyz_grid
 
 def preview_checkpoint(save_file_path: str, checkpoint_name: str, checkpoint_path: str, 
         # preview view config

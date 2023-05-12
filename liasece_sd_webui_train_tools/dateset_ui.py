@@ -13,6 +13,7 @@ from liasece_sd_webui_train_tools import no_alpha_0_picture
 
 from liasece_sd_webui_train_tools.project import *
 from liasece_sd_webui_train_tools.config_file import *
+import liasece_sd_webui_train_tools.tools.preprocess as preprocess
 # from liasece_sd_webui_train_tools.project_version_ui import *
 # from liasece_sd_webui_train_tools.ui import *
 # from liasece_sd_webui_train_tools.checkpoint_preview_ui import *
@@ -103,28 +104,29 @@ def on_ui_update_dataset_click(id: str, project: str, version: str, input_train_
 
     try:
         no_alpha_0_picture.rangeAllImage(origin_data_path, origin_preload_data_path)
-        modules.textual_inversion.preprocess.preprocess(None, origin_preload_data_path, processed_output_path, 
-            process_width,
-            process_height,
-            preprocess_txt_action,
-            process_flip,
-            process_split,
-            process_caption,
-            process_caption_deepbooru,
-            process_split_threshold,
-            process_overlap_ratio,
-            process_focal_crop,
-            process_focal_crop_face_weight,
-            process_focal_crop_entropy_weight,
-            process_focal_crop_edges_weight,
-            process_focal_crop_debug,
-            process_multicrop,
-            process_multicrop_mindim,
-            process_multicrop_maxdim,
-            process_multicrop_minarea,
-            process_multicrop_maxarea,
-            process_multicrop_objective,
-            process_multicrop_threshold,
+        preprocess.preprocess(None, origin_preload_data_path, processed_output_path, 
+            process_width = process_width,
+            process_height = process_height,
+            preprocess_txt_action = preprocess_txt_action,
+            process_keep_original_size = False,
+            process_flip = process_flip,
+            process_split = process_split,
+            process_caption = process_caption,
+            process_caption_deepbooru = process_caption_deepbooru,
+            split_threshold = process_split_threshold,
+            overlap_ratio = process_overlap_ratio,
+            process_focal_crop = process_focal_crop,
+            process_focal_crop_face_weight = process_focal_crop_face_weight,
+            process_focal_crop_entropy_weight = process_focal_crop_entropy_weight,
+            process_focal_crop_edges_weight = process_focal_crop_edges_weight,
+            process_focal_crop_debug = process_focal_crop_debug,
+            process_multicrop = process_multicrop,
+            process_multicrop_mindim = process_multicrop_mindim,
+            process_multicrop_maxdim = process_multicrop_maxdim,
+            process_multicrop_minarea = process_multicrop_minarea,
+            process_multicrop_maxarea = process_multicrop_maxarea,
+            process_multicrop_objective = process_multicrop_objective,
+            process_multicrop_threshold = process_multicrop_threshold,
         )
     except Exception as e:
         printD("dataset update error", e)
