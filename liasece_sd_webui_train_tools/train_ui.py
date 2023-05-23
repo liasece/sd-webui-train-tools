@@ -19,6 +19,9 @@ from liasece_sd_webui_train_tools.checkpoint_preview_ui import *
 # from liasece_sd_webui_train_tools.dateset_ui import *
 # from liasece_sd_webui_train_tools.train_ui import *
 
+def model_path_for_train():
+    return shared.cmd_opts.ckpt_dir if shared.cmd_opts.ckpt_dir is not None else sd_models.model_path
+
 def on_train_begin_click(id: str, project: str, version: str,
         # train config
         train_base_model: str, 
@@ -85,7 +88,7 @@ def on_train_begin_click(id: str, project: str, version: str,
     train_base_model_name = ""
     for x in sd_models.checkpoints_list.values():
         if x.title == train_base_model:
-            train_base_model_path = os.path.join(sd_models.model_path, x.name)
+            train_base_model_path = os.path.join(model_path_for_train(), x.name)
             train_base_model_name = os.path.splitext(x.name)[0]
             break
     processed_path = get_project_version_dataset_processed_path(project, version)
