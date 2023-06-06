@@ -93,7 +93,7 @@ def preview_checkpoint(save_file_path: str, checkpoint_name: str, checkpoint_pat
         return -1
     args = []
     if len(preview_sampling_method) > 1:
-        args+=[find_index_in_current_axis_options("Sampler"), preview_sampling_method.join(",")]
+        args+=[find_index_in_current_axis_options("Sampler"), ",".join(preview_sampling_method)]
     if len(preview_sampling_steps.split(",")) > 1:
         args+=[find_index_in_current_axis_options("Steps"), preview_sampling_steps]
     if len(preview_cfg_scale.split(",")) > 1:
