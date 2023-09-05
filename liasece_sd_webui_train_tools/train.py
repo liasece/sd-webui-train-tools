@@ -31,7 +31,7 @@ def train(cfg: ArgStore) -> None:
     with pc.PythonContextWarper(
             to_module_path= os.path.abspath(os.path.join(os.path.dirname(__file__), "sd_scripts")), 
             path_include= os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), 
-            sub_module="library",
+            sub_module=["library", "networks"],
         ):
         # begin training
         train_network.train(args)

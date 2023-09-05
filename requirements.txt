@@ -1,4 +1,4 @@
-accelerate
+accelerate==0.15.0
 transformers
 ftfy
 albumentations
