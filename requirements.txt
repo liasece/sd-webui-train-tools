@@ -21,6 +21,7 @@ fairscale
 tensorflow
 huggingface-hub
 # for kohya_ss library
+tensorrt
 GitPython
 toml
 voluptuous
