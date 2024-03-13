@@ -3,7 +3,7 @@ import cv2
 import os
 import numpy as np
 
-def transparence2Black(img) -> cv2.Mat:
+def transparency2White(img) -> cv2.Mat:
     sp = img.shape
     width = sp[0]
     height = sp[1]
@@ -11,10 +11,14 @@ def transparence2Black(img) -> cv2.Mat:
         for xw in range(width):
             color_d = img[xw, yh]
             if (len(color_d) == 4 and color_d[3] != 255):
-                scale = 1-((255 - color_d[3]) / 255)
+                alpha = color_d[3] / 255.0
 
-                img[xw, yh] = [color_d[0]*scale, color_d[1]
-                               * scale, color_d[2]*scale, 255]
+                img[xw, yh] = [
+                    int(color_d[0] * alpha + 255 * (1 - alpha)),
+                    int(color_d[1] * alpha + 255 * (1 - alpha)),
+                    int(color_d[2] * alpha + 255 * (1 - alpha)),
+                    255
+                ]
     return img
 
 # range all image in folder
@@ -39,7 +43,7 @@ def rangeAllImage(inputPath, outputPath) -> list[cv2.Mat]:
     res = [cv2.Mat]
     import os
     for (file,img) in readCv2Images(inputPath):
-        img = transparence2Black(img)
+        img = transparency2White(img)
         cv2.imwrite(str(os.path.join(outputPath, file)), img)
         # convert to image
         res.append(img)
