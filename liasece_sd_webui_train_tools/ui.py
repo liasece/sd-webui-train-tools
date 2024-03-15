@@ -130,6 +130,7 @@ def new_ui():
                             train_base_model_refresh_button = ui.ToolButton(value=ui.refresh_symbol, elem_id="train_base_model_refresh_button")
                         with gr.Row():
                             train_base_on_sd_v2 = gr.Checkbox(label="Base on Stable Diffusion V2", value=False, elem_id="train_base_on_sd_v2", interactive = True)
+                            use_sdxl = gr.Checkbox(label="Base on Stable Diffusion XL", value=False, elem_id="use_sdxl", interactive = True)
                         with gr.Row():
                             train_xformers = gr.Checkbox(label="Use xformers", value=True, elem_id="train_xformers", interactive = True)
                         with gr.Row():
@@ -139,11 +140,12 @@ def new_ui():
                     with gr.Column():
                         train_batch_size = gr.Number(value=1, label="Batch size", elem_id="train_batch_size", interactive = True)
                         train_num_epochs = gr.Number(value=40, label="Number of epochs", elem_id="train_num_epochs", interactive = True)
-                        train_learning_rate = gr.Textbox(value="0.0001", label="Learning rate", elem_id="train_learning_rate", interactive = True)
+                        train_learning_rate = gr.Textbox(value="0.0001", label="Learning rate(Multi-select e.g. 0.0001,0.0002)", elem_id="train_learning_rate", interactive = True)
+                        sd_script_args = gr.Textbox(value="", label="Append or override the sd_script args. (e.g. `--lr_scheduler=\"constant_with_warmup\" --max_grad_norm=0.0`)", elem_id="sd_script_args", interactive = True)
                     with gr.Column():
                         train_net_dim = gr.Number(value=128, label="Net dim (128 ~ 144MB)", elem_id="train_net_dim", interactive = True)
                         train_alpha = gr.Number(value=64, label="Alpha (default is half of Net dim)", elem_id="train_alpha", interactive = True)
-                        train_optimizer_type = gr.Dropdown(label="Optimizer type",value=["Lion"], choices=["Adam", "AdamW", "AdamW8bit", "Lion", "SGDNesterov", "SGDNesterov8bit", "DAdaptation", "AdaFactor"], multiselect = True, interactive = True, elem_id="train_optimizer_type")
+                        train_optimizer_type = gr.Dropdown(label="Optimizer type(Multi-select)",value=["Lion"], choices=["Adam", "AdamW", "AdamW8bit", "Lion", "SGDNesterov", "SGDNesterov8bit", "DAdaptation", "AdaFactor"], multiselect = True, interactive = True, elem_id="train_optimizer_type")
                         train_mixed_precision = gr.Dropdown(label="Mixed precision (If your graphics card supports bf16 better)",value="fp16", choices=["fp16", "bf16"], interactive = True, elem_id="train_mixed_precision")
                 with gr.Row():
                     with gr.Column(scale=2):
@@ -248,12 +250,14 @@ def new_ui():
                 train_finish_generate_all_checkpoint_preview,
                 train_optimizer_type,
                 train_learning_rate,
+                sd_script_args,
                 train_net_dim,
                 train_alpha,
                 train_clip_skip,
                 train_mixed_precision,
                 train_xformers,
                 train_base_on_sd_v2,
+                use_sdxl,
             ]
         def preview_config_inputs():
             return [

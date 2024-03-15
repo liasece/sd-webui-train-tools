@@ -13,6 +13,7 @@ from typing import Union
 import gc
 import torch
 
+from liasece_sd_webui_train_tools.util import *
 import liasece_sd_webui_train_tools.PythonContextWarper as pc
 with pc.PythonContextWarper(
         to_module_path= os.path.abspath(os.path.join(os.path.dirname(__file__), "sd_scripts")), 
@@ -30,7 +31,6 @@ class ArgStore:
         self.save_json_folder: Union[str, None] = None
         self.save_json_name: Union[str, None] = None
         self.load_json_path: Union[str, None] = None
-        self.multi_run_folder: Union[str, None] = None
         self.reg_img_folder: Union[str, None] = None
         self.sample_prompts: Union[str, None] = None  # path to a txt file that has all of the sample prompts in it,
         # one per line. Only goes to 75 tokens, will cut off the rest. Just place the prompts into the txt file per line
@@ -188,6 +188,11 @@ class ArgStore:
         self.locon_dim: Union[int, None] = None  # deprecated
         self.locon_alpha: Union[int, None] = None  # deprecated
         self.locon: bool = False  # deprecated
+        self.use_sdxl: bool = False  # use the sdxl trainer
+        self.no_half_vae: bool = False  # Disable the half-precision (mixed-precision) VAE. VAE for SDXL seems to produce NaNs in some cases. This option is useful to avoid the NaNs.
+        self.cache_text_encoder_outputs: bool = False  # Cache the outputs of the text encoders. This option is useful to reduce the GPU memory usage. This option cannot be used with options for shuffling or dropping the captions.
+        self.cache_text_encoder_outputs_to_disk: bool = False  # Cache the outputs of the text encoders. This option is useful to reduce the GPU memory usage. This option cannot be used with options for shuffling or dropping the captions.
+        self.ext_sd_script_args: str = ""  # Append or override the sd_script args. (e.g. `--lr_scheduler="constant_with_warmup" --max_grad_norm=0.0`)
 
     # Creates the dict that is used for the rest of the code, to facilitate easier json saving and loading
     def convert_args_to_dict(self):
@@ -196,32 +201,11 @@ class ArgStore:
     def create_args(self) -> argparse.Namespace:
         parser = Parser()
         args = self.convert_args_to_dict()
-        multi_path = args['multi_run_folder']
-        if multi_path and ensure_path(multi_path, "multi_run_folder"):
-            for file in os.listdir(multi_path):
-                if os.path.isdir(file) or file.split(".")[-1] != "json":
-                    continue
-                args = self.convert_args_to_dict()
-                args['json_load_skip_list'] = None
-                try:
-                    ensure_file_paths(args)
-                except FileNotFoundError:
-                    print("failed to find one or more folders or paths, skipping.")
-                    continue
-                if args['tag_occurrence_txt_file']:
-                    get_occurrence_of_tags(args)
-                args = parser.create_args(self.change_dict_to_internal_names(args))
-                train_network.train(args)
-                gc.collect()
-                torch.cuda.empty_cache()
-                if not os.path.exists(os.path.join(multi_path, "complete")):
-                    os.makedirs(os.path.join(multi_path, "complete"))
-                os.rename(os.path.join(multi_path, file), os.path.join(multi_path, "complete", file))
-            print("completed all training")
-            quit()
         ensure_file_paths(args)
         if args['tag_occurrence_txt_file']:
             get_occurrence_of_tags(args)
+        if self.use_sdxl:
+            self.no_half_vae = True
         args = parser.create_args(self.change_dict_to_internal_names(args))
         return args
 
@@ -283,7 +267,7 @@ def find_max_steps(args: dict) -> int:
 
 def ensure_file_paths(args: dict) -> None:
     failed_to_find = False
-    folders_to_check = ['img_folder', 'output_folder', 'save_json_folder', 'multi_run_folder',
+    folders_to_check = ['img_folder', 'output_folder', 'save_json_folder',
                         'reg_img_folder', 'log_dir']
     for folder in folders_to_check:
         if folder in args and args[folder] is not None:
@@ -360,15 +344,33 @@ def ensure_path(path, name, ext_list=None) -> bool:
 
 class Parser:
     def __init__(self) -> None:
-        self.parser = train_network.setup_parser()
+        parser = train_network.setup_parser()
+        parser.add_argument(
+            "--cache_text_encoder_outputs", action="store_true", help="cache text encoder outputs / text encoderの出力をキャッシュする"
+        )
+        parser.add_argument(
+            "--cache_text_encoder_outputs_to_disk",
+            action="store_true",
+            help="cache text encoder outputs to disk / text encoderの出力をディスクにキャッシュする",
+        )
+        self.parser = parser
 
     def create_args(self, args: dict) -> argparse.Namespace:
         remove_epochs = False
-        args_list = []
-        skip_list = ["save_json_folder", "load_json_path", "multi_run_folder", "json_load_skip_list",
+        args_list: list[str] = []
+        skip_list = ["save_json_folder", "load_json_path", "json_load_skip_list",
                      "tag_occurrence_txt_file", "sort_tag_occurrence_alphabetically", "save_json_only",
                      "warmup_lr_ratio", "optimizer_args", "locon_dim", "locon_alpha", "locon", "lyco", "network_args",
-                     "resolution", "height_resolution"]
+                     "resolution", "height_resolution", "use_sdxl", "ext_sd_script_args"]
+
+        # decode ext_sd_script_args
+        if "ext_sd_script_args" in args and args["ext_sd_script_args"]:
+            ext_sd_script_args = args["ext_sd_script_args"].split("--")
+            for arg in ext_sd_script_args:
+                if not arg:
+                    continue
+                args_list.append(f"--{arg}")
+
         for key, value in args.items():
             if not value:
                 continue
@@ -376,6 +378,15 @@ class Parser:
                 continue
             if key == "max_train_steps":
                 remove_epochs = True
+            # check key is in the parser
+            already_exists = False
+            for arg in args_list:
+                if arg.startswith(f"--{key}"):
+                    already_exists = True
+                    break
+            if already_exists:
+                printD(f"Skipping {key} as it already exists")
+                continue
             if isinstance(value, bool):
                 args_list.append(f"--{key}")
             else:

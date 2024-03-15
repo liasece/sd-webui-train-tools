@@ -6,9 +6,11 @@ import importlib
 import pkg_resources
 
 from liasece_sd_webui_train_tools.ArgsList import ArgStore
+from liasece_sd_webui_train_tools.util import *
 from modules import script_loading
 
 import liasece_sd_webui_train_tools.sd_scripts.train_network as train_network
+import liasece_sd_webui_train_tools.sd_scripts.sdxl_train_network as sdxl_train_network
 
 import liasece_sd_webui_train_tools.PythonContextWarper as pc
 import liasece_sd_webui_train_tools.util as util
@@ -34,4 +36,9 @@ def train(cfg: ArgStore) -> None:
             sub_module=["library", "networks"],
         ):
         # begin training
-        train_network.train(args)
+        if cfg.use_sdxl:
+            trainer = sdxl_train_network.SdxlNetworkTrainer()
+        else:
+            trainer = train_network.NetworkTrainer()
+        printD("train begin", args)
+        trainer.train(args)

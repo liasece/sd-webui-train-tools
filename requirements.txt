@@ -1,10 +1,10 @@
-accelerate==0.15.0
-transformers
+accelerate==0.25.0
+diffusers[torch]==0.25.0
+transformers==4.36.2
 ftfy
 albumentations
 opencv-python
 einops
-diffusers[torch]==0.10.2
 pytorch-lightning
 bitsandbytes
 tensorboard

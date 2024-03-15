@@ -31,12 +31,14 @@ def on_train_begin_click(id: str, project: str, version: str,
         train_finish_generate_all_checkpoint_preview: bool,
         train_optimizer_type: list[str],
         train_learning_rate: str,
+        sd_script_args: str,
         train_net_dim: int,
         train_alpha: int,
         train_clip_skip: int,
         train_mixed_precision: str,
         train_xformers: bool,
         train_base_on_sd_v2: bool,
+        use_sdxl: bool, # use sdxl
         # preview view config
         preview_include_sub_img: bool,
         # txt2txt
@@ -61,12 +63,14 @@ def on_train_begin_click(id: str, project: str, version: str,
         "train_finish_generate_all_checkpoint_preview": train_finish_generate_all_checkpoint_preview,
         "train_optimizer_type": train_optimizer_type,
         "train_learning_rate": train_learning_rate,
+        "sd_script_args": sd_script_args,
         "train_net_dim": int(train_net_dim),
         "train_alpha": int(train_alpha),
         "train_clip_skip": int(train_clip_skip),
         "train_mixed_precision": train_mixed_precision,
         "train_xformers": train_xformers,
         "train_base_on_sd_v2": train_base_on_sd_v2,
+        "use_sdxl": use_sdxl,
     })
     save_preview_config(project, version, {
         # preview view config
@@ -119,6 +123,8 @@ def on_train_begin_click(id: str, project: str, version: str,
             cfg.mixed_precision = train_mixed_precision
             cfg.xformers = train_xformers
             cfg.v2 = train_base_on_sd_v2
+            cfg.use_sdxl = use_sdxl
+            cfg.ext_sd_script_args = sd_script_args
             # check if reg path exist
             if os.path.exists(os.path.join(processed_path, "..", "reg")):
                 cfg.reg_img_folder = os.path.abspath(os.path.join(processed_path, "..", "reg"))

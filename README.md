@@ -100,6 +100,14 @@ English (TODO) [google translate](https://github-com.translate.goog/liasece/sd-w
 
 在 stable-diffusion-webui 的运行命令行中可以看到训练的过程及进度。
 
+### 使用 SD2 或 SDXL 作为基础模型
+
+请正确勾选 `Base on Stable Diffusion V2` 或者 `Base on Stable Diffusion XL` ，否则会导致训练失败。
+
+### 高级 sd_script 参数追加或覆盖
+
+在 `Append or override the sd_script args.` 文本框中输入参数，务必使用 `--` 开头的参数，例如：`--lr_scheduler="constant_with_warmup" --max_grad_norm=0.0` 。插件代码中会使用 `--` 分隔符作为参数间的分隔符。
+
 ### 一次训练多种参数训练，充分利用你睡觉时的 GPU
 
 有时，一套训练配置可能并不是最优的。等待你的训练结束然后再重新开始训练，这样的效率太低了。因此，你可以一次性配置多种参数，点击一次训练，自动组合不同的参数进行训练。
