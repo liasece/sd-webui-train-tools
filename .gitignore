@@ -128,3 +128,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+liasece_sd_webui_train_tools/sd_scripts/.github/

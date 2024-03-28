@@ -269,3 +269,7 @@ dataset/reg/10_object
 如果仍然存在疑问，可以参考 [webui 这里](https://github.com/AUTOMATIC1111/stable-diffusion-webui/commit/22bcc7be) 的讨论。
 
 如果你只想解决问题，可以尝试 [这个 issues](https://github.com/liasece/sd-webui-train-tools/issues/4) 的方案，在启动 webui 时添加参数：`--no-gradio-queue`
+
+## 引用
+
+本插件的训练脚本引用自 [sd-scripts](https://github.com/kohya-ss/sd-scripts) 。由于 sd-scripts 本身是一个非常优秀的工具，所以我没有对它进行修改，而是直接引用了它。
